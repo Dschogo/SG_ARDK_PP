@@ -1,0 +1,19 @@
+{
+    "version": "0.1",
+    "pois": [
+        {
+            "name": "Sitzsack",
+            "position": [
+                49.857982,
+                8.5583
+            ]
+        },
+        {
+            "name": "Terrasse",
+            "position": [
+                49.857936,
+                8.558297
+            ]
+        }
+    ]
+}
