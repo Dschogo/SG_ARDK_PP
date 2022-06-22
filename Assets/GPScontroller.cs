@@ -60,7 +60,7 @@ public class GPScontroller : MonoBehaviour
             Quaternion compass = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
 
             angle = (int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y);
-            compass_rect.SetPositionAndRotation(compass_rect.transform.position, Quaternion.Euler(0, 0, angle - 90));
+            compass_rect.SetPositionAndRotation(compass_rect.transform.position, Quaternion.Euler(60, 0, angle - 90));
 
             rotat.text = compass.eulerAngles.y.ToString() + " : " + getBearing(curr_pos, wanna_be).ToString() + " : " + angle.ToString() + " : " + Input.compass.headingAccuracy.ToString(); ;
         }
