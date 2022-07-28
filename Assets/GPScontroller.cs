@@ -7,17 +7,12 @@ using GeoCoordinatePortable;
 
 public class GPScontroller : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI Cords;
     [SerializeField] private TextMeshProUGUI Distance;
-    [SerializeField] private TextMeshProUGUI rotat;
     [SerializeField] private RawImage compass_img;
     [SerializeField] private Button found_btn;
 
-    [SerializeField] private int Radius;
-
-
     private bool inradius;
-    private double distance = 20;
+    private double distance = 0;
     private RectTransform compass_rect;
     private int angle;
     // Start is called before the first frame update
@@ -31,15 +26,17 @@ public class GPScontroller : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (distance <= Radius)
+        if (distance <= Stateholder.radius)
         {
             inradius = true;
             found_btn.interactable = true;
+            compass_img.enabled = false;
         }
         else
         {
             inradius = false;
             found_btn.interactable = false;
+            compass_img.enabled = true;
         }
     }
 
@@ -48,11 +45,10 @@ public class GPScontroller : MonoBehaviour
 
         if (Input.location.status == LocationServiceStatus.Failed)
         {
-            Cords.text = "Unable to determine device location";
+            Debug.Log("Failed GPS");
         }
         else
         {
-            Cords.text = "Latitude: " + Input.location.lastData.latitude + " Longitude: " + Input.location.lastData.longitude;
 
             GeoCoordinate curr_pos = new GeoCoordinate(Input.location.lastData.latitude, Input.location.lastData.longitude);
             GeoCoordinate wanna_be = new GeoCoordinate(Stateholder.pois[Stateholder.curr_poi].coordinates[0], Stateholder.pois[Stateholder.curr_poi].coordinates[1]);
@@ -62,9 +58,8 @@ public class GPScontroller : MonoBehaviour
             angle = (int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y);
             compass_rect.SetPositionAndRotation(compass_rect.transform.position, Quaternion.Euler(60, 0, angle - 90));
 
-            rotat.text = compass.eulerAngles.y.ToString() + " : " + getBearing(curr_pos, wanna_be).ToString() + " : " + angle.ToString() + " : " + Input.compass.headingAccuracy.ToString(); ;
         }
-        Distance.text = "Distance: " + ((int)distance).ToString() + "m";
+        Distance.text = inradius ? "Distance: <" + Stateholder.radius + "m" : "Distance: " + ((int)distance).ToString() + "m";
         found_btn.interactable = inradius;
     }
 
