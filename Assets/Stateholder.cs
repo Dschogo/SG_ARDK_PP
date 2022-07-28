@@ -5,4 +5,5 @@ using UnityEngine;
 public class Stateholder : MonoBehaviour
 {
     public static int curr_poi;
+    public static POI[] pois;
 }
