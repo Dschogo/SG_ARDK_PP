@@ -17,8 +17,7 @@
         // string[] _locationStrings;
         Vector2d[] _locations;
 
-        [SerializeField]
-        float _spawnScale = 100f;
+        float _spawnScale;
 
         [SerializeField]
         GameObject _markerPrefab;

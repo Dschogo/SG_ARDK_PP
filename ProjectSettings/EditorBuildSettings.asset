@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Title.unity
+    guid: 6b9fb7eea4fc887429751cb5caa9cb4b
+  - enabled: 1
     path: Assets/Scenes/Main.unity
     guid: b6474ea881770b3409e04772a882bc0a
   - enabled: 1
@@ -15,8 +18,11 @@ EditorBuildSettings:
     path: Assets/Scenes/VPSCreate.unity
     guid: 9416b9171502e0e4e87f1802caef1483
   - enabled: 1
-    path: Assets/Scenes/VPSSearch.unity
+    path: Assets/Scenes/VPSsearch.unity
     guid: 7fc50a6b4f982a94085782c09fa13a9f
+  - enabled: 1
+    path: Assets/Scenes/Inv.unity
+    guid: f81b0ed8810fd184280f028f09c9bc2c
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 6f70b1763ea9d4749a5714274f31dcd2,
       type: 2}

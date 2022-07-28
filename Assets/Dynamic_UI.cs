@@ -7,6 +7,7 @@ using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEngine.UI;
 using GeoCoordinatePortable;
+using System.IO;
 
 [System.Serializable]
 public class POI
@@ -38,11 +39,23 @@ public class Dynamic_UI : MonoBehaviour
     private bool fechtedpoi = false;
     private bool buildodui = false;
 
+    private float _headingVelocity = 0f;
+
 
     void Start()
     {
         //StartCoroutine(GetRequest("https://pastebin.com/raw/fp0dVQnw"));
-        StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POI.json"));
+        if (Application.platform == RuntimePlatform.WindowsEditor)
+        {
+            Debug.Log("Reading local poi json");
+            StreamReader reader = new StreamReader("Assets/POI.json");
+            pois = JsonUtility.FromJson<POIS>(reader.ReadToEnd()).pois;
+            this.fechtedpoi = true;
+        }
+        else
+        {
+            StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POI.json"));
+        }
 
     }
 
@@ -74,9 +87,10 @@ public class Dynamic_UI : MonoBehaviour
             }
 
         }
-
-
-
+        else
+        {
+            entry.GetComponentsInChildren<RawImage>()[0].enabled = false;
+        }
 
     }
 
@@ -105,7 +119,9 @@ public class Dynamic_UI : MonoBehaviour
                         arrow.enabled = true;
                         Quaternion compass = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
 
-                        int angle = (int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y);
+                        float angle = Mathf.SmoothDampAngle((int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y), Input.compass.trueHeading, ref _headingVelocity, 0.1f);
+
+                        //int angle = (int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y);
 
                         arrow.transform.SetPositionAndRotation(arrow.transform.position, Quaternion.Euler(0, 0, angle - 90));
                     }
