@@ -39,7 +39,8 @@ public class Dynamic_UI : MonoBehaviour
 
     void Start()
     {
-        StartCoroutine(GetRequest("https://pastebin.com/raw/fp0dVQnw"));
+        //StartCoroutine(GetRequest("https://pastebin.com/raw/fp0dVQnw"));
+        StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POI.json"));
 
     }
 
@@ -109,11 +110,10 @@ public class Dynamic_UI : MonoBehaviour
                     break;
                 case UnityWebRequest.Result.Success:
                     Debug.Log(pages[page] + ":\nReceived: " + webRequest.downloadHandler.text);
-                    if (pages[page] == "fp0dVQnw")
-                    {
-                        this.fechtedpoi = true;
-                        pois = JsonUtility.FromJson<POIS>(webRequest.downloadHandler.text).pois;
-                    }
+                    //if (pages[page] == "fp0dVQnw")
+                    this.fechtedpoi = true;
+                    pois = JsonUtility.FromJson<POIS>(webRequest.downloadHandler.text).pois;
+
                     break;
             }
         }
