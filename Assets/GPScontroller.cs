@@ -8,13 +8,15 @@ using GeoCoordinatePortable;
 public class GPScontroller : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI Distance;
+    [SerializeField] private TextMeshProUGUI poiname;
     [SerializeField] private RawImage compass_img;
     [SerializeField] private Button found_btn;
 
     private bool inradius;
     private double distance = 0;
     private RectTransform compass_rect;
-    private int angle;
+
+    private float _headingVelocity = 0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -22,6 +24,7 @@ public class GPScontroller : MonoBehaviour
         inradius = false;
         found_btn.interactable = false;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
+        poiname.text = Stateholder.pois[Stateholder.curr_poi].name;
     }
 
     void FixedUpdate()
@@ -55,11 +58,12 @@ public class GPScontroller : MonoBehaviour
             distance = curr_pos.GetDistanceTo(wanna_be);
             Quaternion compass = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
 
-            angle = (int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y);
+            float angle = Mathf.SmoothDampAngle((int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y), Input.compass.trueHeading, ref _headingVelocity, 0.1f);
+
             compass_rect.SetPositionAndRotation(compass_rect.transform.position, Quaternion.Euler(60, 0, angle - 90));
 
         }
-        Distance.text = inradius ? "Distance: <" + Stateholder.radius + "m" : "Distance: " + ((int)distance).ToString() + "m";
+        Distance.text = inradius ? "<" + Stateholder.radius + "m" : ((int)distance).ToString() + "m";
         found_btn.interactable = inradius;
     }
 

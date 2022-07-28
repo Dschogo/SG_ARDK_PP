@@ -14,19 +14,27 @@ public class image : MonoBehaviour
     {
         RawImage img = GetComponent<RawImage>();
         my_transform = this.transform.position;
-        try
+        if (Stateholder.pois[Stateholder.curr_poi].image != null && Stateholder.pois[Stateholder.curr_poi].image != "")
         {
-            byte[] bytes = System.Convert.FromBase64String(Stateholder.pois[Stateholder.curr_poi].image.Split(',')[1]);
-            Texture2D tex = new Texture2D(1, 1);
-            tex.LoadImage(bytes);
-            tex.Apply();
+            try
+            {
+                byte[] bytes = System.Convert.FromBase64String(Stateholder.pois[Stateholder.curr_poi].image.Split(',')[1]);
+                Texture2D tex = new Texture2D(1, 1);
+                tex.LoadImage(bytes);
+                tex.Apply();
 
-            img.texture = tex;
+                img.texture = tex;
+            }
+            catch (System.Exception e)
+            {
+                Debug.Log(e);
+            }
         }
-        catch (System.Exception e)
+        else
         {
-            Debug.Log(e);
+            img.enabled = false;
         }
+
     }
 
     public void make_big()
