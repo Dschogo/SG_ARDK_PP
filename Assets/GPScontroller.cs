@@ -55,7 +55,7 @@ public class GPScontroller : MonoBehaviour
             Cords.text = "Latitude: " + Input.location.lastData.latitude + " Longitude: " + Input.location.lastData.longitude;
 
             GeoCoordinate curr_pos = new GeoCoordinate(Input.location.lastData.latitude, Input.location.lastData.longitude);
-            GeoCoordinate wanna_be = new GeoCoordinate(49.86086629274778f, 8.566904834576274f);
+            GeoCoordinate wanna_be = new GeoCoordinate(Stateholder.pois[Stateholder.curr_poi].coordinates[0], Stateholder.pois[Stateholder.curr_poi].coordinates[1]);
             distance = curr_pos.GetDistanceTo(wanna_be);
             Quaternion compass = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
 
