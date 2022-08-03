@@ -1,15 +1,12 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
 
-using Niantic.ARDK.AR.SLAM;
 using System;
 using System.Collections.Generic;
-
-using Niantic.ARDK.AR.Awareness.Depth.Generators;
+using System.Runtime.CompilerServices;
 using Niantic.ARDK.AR.ReferenceImage;
 using Niantic.ARDK.Utilities.Collections;
 using Niantic.ARDK.Utilities.Logging;
 
-using UnityEngine;
 
 namespace Niantic.ARDK.AR.Configuration
 {
@@ -41,7 +38,7 @@ namespace Niantic.ARDK.AR.Configuration
 
     public float MeshingRadius
     {
-      get { return _meshingRadius; }
+      get => _meshingRadius;
       set
       {
         if (value > 0 && value < 5)
@@ -65,14 +62,8 @@ namespace Niantic.ARDK.AR.Configuration
       EmptyArdkReadOnlyCollection<IARReferenceImage>.Instance;
     public IReadOnlyCollection<IARReferenceImage> DetectionImages
     {
-      get
-      {
-        return _detectionImages;
-      }
-      set
-      {
-        _detectionImages = value;
-      }
+      get => _detectionImages;
+      set => _detectionImages = value;
     }
 
     public void SetDetectionImagesAsync

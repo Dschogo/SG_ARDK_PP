@@ -240,7 +240,7 @@ namespace Niantic.ARDK.Networking
     )
     {
       if (data == null)
-        throw new ArgumentNullException(nameof(data));
+        data = new Byte[0];
 
       _CheckThread();
 
@@ -255,12 +255,6 @@ namespace Niantic.ARDK.Networking
           "that is not connected."
         );
 
-        return;
-      }
-
-      if (data.Length == 0)
-      {
-        ARLog._Warn("ARDK: Cannot send empty data array.");
         return;
       }
 

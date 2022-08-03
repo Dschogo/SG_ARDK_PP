@@ -42,7 +42,7 @@ namespace Niantic.ARDK.AR.ReferenceImage
       var result =
         _allImages.GetOrAdd(cppAddress, (_) => new _NativeARReferenceImage(nativeHandle));
 
-      if (result._nativeHandle != nativeHandle)
+      if (result._NativeHandle != nativeHandle)
       {
         // We got in a very rare situation. After our TryGetValue, another thread actually did add
         // a wrapper for the same cppAddress we are using. This means there are 2 handles for the
@@ -61,13 +61,13 @@ namespace Niantic.ARDK.AR.ReferenceImage
       if (nativeHandle == IntPtr.Zero)
         throw new ArgumentNullException("nativeHandle can't be Zero.", "nativeHandle");
 
-      _nativeHandle = nativeHandle;
+      _NativeHandle = nativeHandle;
       GC.AddMemoryPressure(_MemoryPressure);
     }
 
     ~_NativeARReferenceImage()
     {
-      _ReleaseImmediate(_nativeHandle);
+      _ReleaseImmediate(_NativeHandle);
       
       GC.RemoveMemoryPressure(_MemoryPressure);
     }
@@ -82,10 +82,10 @@ namespace Niantic.ARDK.AR.ReferenceImage
     {
       GC.SuppressFinalize(this);
       
-      var nativeHandle = _nativeHandle;
+      var nativeHandle = _NativeHandle;
       if (nativeHandle != IntPtr.Zero)
       {
-        _nativeHandle = IntPtr.Zero;
+        _NativeHandle = IntPtr.Zero;
 
         _ReleaseImmediate(nativeHandle);
         
@@ -93,11 +93,7 @@ namespace Niantic.ARDK.AR.ReferenceImage
       }
     }
 
-    private IntPtr _nativeHandle;
-    internal IntPtr _NativeHandle
-    {
-      get { return _nativeHandle;}
-    }
+    internal IntPtr _NativeHandle { get; private set; }
 
     public string Name
     {
@@ -106,14 +102,14 @@ namespace Niantic.ARDK.AR.ReferenceImage
         var stringBuilder = new StringBuilder(25);
         
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARReferenceImage_GetName(_nativeHandle, stringBuilder, stringBuilder.Capacity);
+          _NARReferenceImage_GetName(_NativeHandle, stringBuilder, stringBuilder.Capacity);
         
         return stringBuilder.ToString();
       }
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARReferenceImage_SetName(_nativeHandle, value);
+          _NARReferenceImage_SetName(_NativeHandle, value);
       }
     }
 
@@ -124,7 +120,7 @@ namespace Niantic.ARDK.AR.ReferenceImage
         var rawPhysicalSize = new float[2];
         
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARReferenceImage_GetPhysicalSize(_nativeHandle, rawPhysicalSize);
+          _NARReferenceImage_GetPhysicalSize(_NativeHandle, rawPhysicalSize);
         
         return new Vector2(rawPhysicalSize[0], rawPhysicalSize[1]);
       }

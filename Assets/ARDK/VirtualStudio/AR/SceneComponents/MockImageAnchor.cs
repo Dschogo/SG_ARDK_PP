@@ -1,7 +1,10 @@
 // Copyright 2022 Niantic, Inc. All Rights Reserved.
 using System;
 
+using Niantic.ARDK.AR;
 using Niantic.ARDK.AR.Anchors;
+using Niantic.ARDK.AR.ARSessionEventArgs;
+using Niantic.ARDK.AR.Configuration;
 using Niantic.ARDK.AR.ReferenceImage;
 using Niantic.ARDK.Utilities.Logging;
 
@@ -28,6 +31,7 @@ namespace Niantic.ARDK.VirtualStudio.AR.Mock
 
     private Texture2D _currImage;
     private bool _imageDirty;
+    private bool _isTracked = false;
 
     private readonly Vector3[] _defaultVertices =
     {
@@ -93,6 +97,10 @@ namespace Niantic.ARDK.VirtualStudio.AR.Mock
     {
       if (_imageDirty)
         UpdateImageDisplay();
+      
+      if (_isTracked)
+        base.Update();
+        
     }
 
     internal override void CreateAndAddAnchorToSession(_IMockARSession arSession)
@@ -103,12 +111,14 @@ namespace Niantic.ARDK.VirtualStudio.AR.Mock
         // a new guid, non-transform related values, etc
 
         var imageAsBytes = _image.GetRawTextureData();
-
+        
         var vertices = GetComponent<MeshFilter>().sharedMesh.vertices;
         var botLeft = transform.localToWorldMatrix * vertices[0];
         var topRight = transform.localToWorldMatrix * vertices[3];
+        botLeft = Quaternion.Inverse(transform.rotation) * botLeft;
+        topRight = Quaternion.Inverse(transform.rotation) * topRight;
         var imageWidth = Mathf.Abs(botLeft.x - topRight.x);
-        var imageHeight = Mathf.Abs(botLeft.y - topRight.y);
+        var imageHeight = Mathf.Abs(botLeft.z - topRight.z);
 
         var referenceImage =
           (_SerializableARReferenceImage)ARReferenceImageFactory.Create
@@ -135,10 +145,14 @@ namespace Niantic.ARDK.VirtualStudio.AR.Mock
 
         // Value starts off as true, so needs to be set to false here
         transform.hasChanged = false;
+        
+        _isTracked = true;
       }
 
       if (!arSession.AddAnchor(_anchorData))
       {
+        _discoveredInSessions.Remove(arSession.StageIdentifier);
+        
         ARLog._WarnFormat
         (
           "Image anchor for {0} cannot be detected. If that is unintended, make sure that a " +
@@ -150,11 +164,29 @@ namespace Niantic.ARDK.VirtualStudio.AR.Mock
 
         enabled = false;
       }
+      else
+      {
+        enabled = true;
+      }
     }
 
     internal override void RemoveAnchorFromSession(_IMockARSession arSession)
     {
       arSession.RemoveAnchor(_anchorData);
+    }
+
+    internal override void OnSessionRanAgain(_IMockARSession arSession)
+    {
+      if (arSession.RunOptions == ARSessionRunOptions.None)
+      {
+        _isTracked = false;
+        
+        foreach (var image in ((IARWorldTrackingConfiguration)arSession.Configuration).DetectionImages)
+          if (image.Name.Equals(_name))
+            _isTracked = true;
+      }
+
+      base.OnSessionRanAgain(arSession);
     }
 
     protected override bool UpdateAnchorData()

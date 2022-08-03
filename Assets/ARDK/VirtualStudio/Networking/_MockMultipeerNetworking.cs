@@ -190,7 +190,25 @@ namespace Niantic.ARDK.VirtualStudio.Networking.Mock
         ARLog._Error("Cannot send data to peers while not connected to a networking session.");
         return;
       }
+      
+      if (peers == null)
+        throw new ArgumentNullException(nameof(peers));
+      
+      // If peers is empty, broadcast the message
+      if (peers.Count() == 0)
+      {
+        if (OtherPeers.Count == 0)
+        {
+          if (sendToSelf)
+            ReceiveDataFromPeer(tag, Self, transportType, data);
 
+          return;
+        }
+        
+        SendDataToPeers(tag, data, OtherPeers, transportType, sendToSelf);
+        return;
+      }
+      
       // In the native implementation, the local peer would always receive the message before
       // other peers (since it is a local event and not sent through the network) if sending
       // to self, which is why this ordering should be maintained.

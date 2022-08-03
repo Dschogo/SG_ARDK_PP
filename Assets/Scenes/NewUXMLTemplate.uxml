@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/uss.uss?fileID=7433441132597879392&amp;guid=1ed0a232f2a8bbd4082288adb86d49e8&amp;type=3#uss" />
     <ui:Label text="Label" display-tooltip-when-elided="true" style="width: auto; font-size: 249px;" />
     <ui:ListView focusable="true" name="Positionen" />
+    <ui:Button text="Inventory" display-tooltip-when-elided="true" style="height: 29px; right: auto; position: absolute; top: 416px; width: 96px;" />
 </ui:UXML>

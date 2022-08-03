@@ -315,7 +315,11 @@ namespace Niantic.ARDK.Utilities
       );
 
       // Rotate the image origin to the specified orientation
+#if UNITY_2021_3_OR_NEWER
       origin = RotateVector(origin, (float)GetAngle(viewportOrientation, ScreenOrientation.LandscapeLeft));
+#else
+      origin = RotateVector(origin, (float)GetAngle(viewportOrientation, ScreenOrientation.Landscape));
+#endif
 
       // Fx and Fy are identical for square pixels
       var focalLength = intrinsics.FocalLength.x;

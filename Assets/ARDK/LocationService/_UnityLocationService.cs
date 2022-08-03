@@ -43,8 +43,8 @@ namespace Niantic.ARDK.LocationService
       }
 
       // Start service
-      Input.location.Start(desiredAccuracyInMeters, updateDistanceInMeters);
       Input.compass.enabled = true;
+      Input.location.Start(desiredAccuracyInMeters, updateDistanceInMeters);
 
       _UpdateLoop.Tick += OnUpdate;
     }

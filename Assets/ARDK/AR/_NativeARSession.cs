@@ -271,7 +271,7 @@ namespace Niantic.ARDK.AR
       if (NativeAccess.Mode == NativeAccess.ModeType.Native)
       {
         var nativeConfiguration = (_NativeARConfiguration)configuration;
-        _NARSession_Run(_nativeHandle, nativeConfiguration._NativeHandle, (UInt64)options);
+        _NARSession_Run(_nativeHandle, nativeConfiguration.NativeHandle, (UInt64)options);
       }
 
       State = ARSessionState.Running;

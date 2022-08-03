@@ -64,20 +64,11 @@ namespace Niantic.ARDK.Extensions
       get { return _arNetworking; }
     }
 
-    public ARSessionManager ARSessionManager
-    {
-      get { return _arSessionManager; }
-    }
+    public ARSessionManager ARSessionManager => _arSessionManager;
 
-    public NetworkSessionManager NetworkSessionManager
-    {
-      get { return _networkSessionManager; }
-    }
+    public NetworkSessionManager NetworkSessionManager => _networkSessionManager;
 
-    protected override bool _CanReinitialize
-    {
-      get { return true; }
-    }
+    protected override bool _CanReinitialize => true;
 
     protected override void InitializeImpl()
     {
@@ -91,18 +82,8 @@ namespace Niantic.ARDK.Extensions
       _networkSessionManager = GetComponent<NetworkSessionManager>();
     }
 
-    private void CreateOnARSessionInitialized(AnyARSessionInitializedArgs args)
-    {
-      var arSession = args.Session;
-
-      if (_arNetworking != null)
-      {
-        ARLog._Error("Failed to create an ARNetworking session because one already exists.");
-        return;
-      }
-
-      _networkSessionManager._InitializeWithIdentifier(arSession.StageIdentifier);
-      _arNetworking = ARNetworkingFactory.Create(arSession, _networkSessionManager.Networking);
+    private void CreateARNetworking(IARSession session) {
+      _arNetworking = ARNetworkingFactory.Create(session, _networkSessionManager.Networking);
 
       ARLog._DebugFormat
       (
@@ -123,6 +104,20 @@ namespace Niantic.ARDK.Extensions
           _arNetworking = null;
           _needToRecreate = false;
         };
+    }
+
+    private void CreateOnARSessionInitialized(AnyARSessionInitializedArgs args)
+    {
+      var arSession = args.Session;
+
+      if (_arNetworking != null)
+      {
+        ARLog._Error("Failed to create an ARNetworking session because one already exists.");
+        return;
+      }
+
+      _networkSessionManager._InitializeWithIdentifier(arSession.StageIdentifier);
+      CreateARNetworking(arSession);
 
       if (_shouldBeRunning)
         EnableSessionManagers();
@@ -161,8 +156,11 @@ namespace Niantic.ARDK.Extensions
 
       _shouldBeRunning = true;
 
-      if (ARSessionManager.ARSession != null)
+      if (ARSessionManager.ARSession != null) {
         EnableSessionManagers();
+        if (_arNetworking == null)
+          CreateARNetworking(ARSessionManager.ARSession);
+      }
     }
 
     protected override void DisableFeaturesImpl()

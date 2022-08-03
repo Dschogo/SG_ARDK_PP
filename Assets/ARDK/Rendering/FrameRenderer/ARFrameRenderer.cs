@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Niantic.ARDK.AR;
+using Niantic.ARDK.AR.Camera;
 using Niantic.ARDK.Utilities;
 using Niantic.ARDK.Utilities.Logging;
 
@@ -172,6 +173,11 @@ namespace Niantic.ARDK.Rendering
 
     // Cached initial screen orientation
     private readonly ScreenOrientation _originalOrientation;
+
+    // Cache the current orientation to update native display geometry when it changes
+#pragma warning disable 0219
+    private ScreenOrientation _currentOrientation = ScreenOrientation.AutoRotation;
+#pragma warning restore 0219
 
     /// Material used to render the frame.
     private Material _renderMaterial;
@@ -502,6 +508,9 @@ namespace Niantic.ARDK.Rendering
 
       // Calculate the target resolution according to the orientation
       var targetResolution = Target.GetResolution(targetOrientation);
+      // Before getting any of the matrices, we need to call CorrectToActualOrientation() make sure
+      // C++ display geometry is updated on Android.
+      CorrectToActualOrientation(frame, targetOrientation, targetResolution.width, targetResolution.height);
 
       // Update the projection matrix
       ProjectionTransform = frame.Camera.CalculateProjectionMatrix
@@ -522,6 +531,23 @@ namespace Niantic.ARDK.Rendering
       );
     }
 
+    private void CorrectToActualOrientation
+    (
+      IARFrame frame,
+      ScreenOrientation orientation,
+      int screenWith,
+      int screenHeight
+    )
+    {
+      if (frame.Camera is IUpdatableARCamera updatableCamera)
+      {
+        if (_currentOrientation != orientation)
+        {
+          updatableCamera.UpdateDisplayGeometry(orientation, screenWith, screenHeight);
+          _currentOrientation = orientation;
+        }
+      }
+    }
     #endregion
   }
 }

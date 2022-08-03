@@ -18,7 +18,7 @@ namespace Niantic.ARDK.VirtualStudio.AR
     private readonly Dictionary<Guid, IARSession> _stageIdentifierToSession =
       new Dictionary<Guid, IARSession>();
 
-    private _IVirtualStudioManager _virtualStudioManager;
+    private readonly _IVirtualStudioManager _virtualStudioManager;
 
     public _MockARSessionMediator(_IVirtualStudioManager virtualStudioMaster)
     {
@@ -31,7 +31,7 @@ namespace Niantic.ARDK.VirtualStudio.AR
     ~_MockARSessionMediator()
     {
       // This class has no unmanaged data, so no need to have a Dispose(false) call.
-      Debug.LogError("EditorARSessionMediator should be destroyed by calling Dispose().");
+      Debug.Log("EditorARSessionMediator should be destroyed by calling Dispose().");
     }
 
     public void Dispose()

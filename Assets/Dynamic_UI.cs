@@ -16,6 +16,8 @@ public class POI
     public float[] coordinates;
 
     public string image;
+
+    public POI[] following;
 }
 
 
@@ -70,6 +72,34 @@ public class Dynamic_UI : MonoBehaviour
 
         entry.GetComponentsInChildren<TextMeshProUGUI>()[1].text = curr_pos.GetDistanceTo(wanna_be).ToString("F2") + "m";
 
+        if (poi.following != null && poi.following.Length > 0)
+        {
+            entry.GetComponentsInChildren<UnityEngine.UI.Image>()[2].enabled = true;
+            entry.GetComponentsInChildren<UnityEngine.UI.Button>()[1].onClick.AddListener(() =>
+            {
+                TextMeshProUGUI texta = entry.GetComponentsInChildren<TextMeshProUGUI>()[2];
+                RectTransform rt = entry.GetComponent<RectTransform>();
+                if (texta.enabled)
+                {
+                    rt.sizeDelta = new Vector2(rt.sizeDelta.x, rt.sizeDelta.y - 100);
+                    texta.enabled = false;
+                }
+                else
+                {
+                    rt.sizeDelta = new Vector2(rt.sizeDelta.x, rt.sizeDelta.y + 100);
+                    texta.enabled = true;
+                    texta.text = "Dies ist eine Schnitzeljagt mit " + (poi.following.Length + 1).ToString() + " Wegpunkten";
+                }
+
+
+
+            });
+        }
+        else
+        {
+            entry.GetComponentsInChildren<UnityEngine.UI.Image>()[2].enabled = false;
+        }
+
         if (poi.image != null)
         {
             try
@@ -92,9 +122,10 @@ public class Dynamic_UI : MonoBehaviour
             entry.GetComponentsInChildren<RawImage>()[0].enabled = false;
         }
 
+
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (fechtedpoi)
         {

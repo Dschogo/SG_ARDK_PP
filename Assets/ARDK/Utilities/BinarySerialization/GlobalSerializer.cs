@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
@@ -146,6 +147,14 @@ namespace Niantic.ARDK.Utilities.BinarySerialization
       RegisterItemSerializer
       (
         SimpleSerializableSerializer<ReadOnlyCollection<IARAnchor>>.Instance,
+        null,
+        false,
+        false
+      );
+      
+      RegisterItemSerializer
+      (
+        SimpleSerializableSerializer<List<IARAnchor>>.Instance,
         null,
         false,
         false

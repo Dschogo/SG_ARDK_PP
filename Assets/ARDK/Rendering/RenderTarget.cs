@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 namespace Niantic.ARDK.Rendering
 {
   /// A render target can either be a camera or an offscreen texture.
-  public readonly struct RenderTarget: 
+  public readonly struct RenderTarget:
     IEquatable<RenderTarget>
   {
     /// The actual camera as a render target, if any.
@@ -21,7 +21,7 @@ namespace Niantic.ARDK.Rendering
 
     // Whether the target is a Unity camera
     public readonly bool IsTargetingCamera;
-    
+
     // Whether the target is a RenderTexture
     public readonly bool IsTargetingTexture;
 
@@ -87,7 +87,7 @@ namespace Niantic.ARDK.Rendering
         // Portrait
         : new Resolution { width = shorter, height = longer };
     }
-    
+
     public static implicit operator RenderTarget(Camera cam)
     {
       return new RenderTarget(cam);
@@ -97,7 +97,7 @@ namespace Niantic.ARDK.Rendering
     {
       return new RenderTarget(texture);
     }
-    
+
     public bool Equals(RenderTarget other)
     {
       return Identifier.Equals(other.Identifier);
@@ -112,7 +112,7 @@ namespace Niantic.ARDK.Rendering
     {
       return Identifier.GetHashCode();
     }
-    
+
     /// Returns the current screen orientation. When called in the editor,
     /// this property infers the orientation from the screen resolution.
     public static ScreenOrientation ScreenOrientation
@@ -121,7 +121,11 @@ namespace Niantic.ARDK.Rendering
       {
 #if UNITY_EDITOR
         return Screen.width > Screen.height
+#if UNITY_2021_3_OR_NEWER
           ? UnityEngine.ScreenOrientation.LandscapeLeft
+#else
+          ? UnityEngine.ScreenOrientation.Landscape
+#endif
           : UnityEngine.ScreenOrientation.Portrait;
 #else
         return Screen.orientation;

@@ -2,7 +2,6 @@
 
 using System.Runtime.CompilerServices;
 
-[assembly:InternalsVisibleTo("Grapeshot")]
 [assembly:InternalsVisibleTo("ARDK-Editor")]
 [assembly:InternalsVisibleTo("ARDKTests")]
 [assembly:InternalsVisibleTo("ARDKPlayModeTests")]

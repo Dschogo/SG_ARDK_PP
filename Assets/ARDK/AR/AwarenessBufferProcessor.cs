@@ -10,10 +10,10 @@ namespace Niantic.ARDK.AR.Awareness
 {
   /// Base class for components that extract information from IAwarenessBuffer objects
   /// to be used in game logic and rendering.
-  public abstract class AwarenessBufferProcessor<TBuffer> 
+  public abstract class AwarenessBufferProcessor<TBuffer>
     where TBuffer: class, IAwarenessBuffer, IDisposable
   {
-    /// Event for when the context awareness feature stream has initialized and the 
+    /// Event for when the context awareness feature stream has initialized and the
     /// application received its initial frame.
     public event ArdkEventHandler<ContextAwarenessArgs<TBuffer>> AwarenessStreamBegan
     {
@@ -32,7 +32,7 @@ namespace Niantic.ARDK.AR.Awareness
 
     /// Alerts subscribers when either the contents of the awareness buffer
     /// or its sampler transform has changed.
-    public event ArdkEventHandler<ContextAwarenessStreamUpdatedArgs<TBuffer>> AwarenessStreamUpdated; 
+    public event ArdkEventHandler<ContextAwarenessStreamUpdatedArgs<TBuffer>> AwarenessStreamUpdated;
 
     /// The CPU copy of the latest awareness buffer
     public TBuffer AwarenessBuffer { get; private set; }
@@ -53,7 +53,7 @@ namespace Niantic.ARDK.AR.Awareness
     {
       get => new Vector2Int(_lastTargetWidth, _lastTargetHeight);
     }
-    
+
     public void Dispose()
     {
       Dispose(true);
@@ -75,7 +75,7 @@ namespace Niantic.ARDK.AR.Awareness
     /// This is primarily used to get camera space positions from depth,
     /// for example posInCamera = depth * BackProjectionTransform * screenUV.
     protected Matrix4x4 BackProjectionTransform { get; private set; }
-    
+
     // The camera to world matrix is the inverted view matrix,
     // matching the orientation of the buffer. It is used
     // to transform points from camera space to world space.
@@ -84,7 +84,7 @@ namespace Niantic.ARDK.AR.Awareness
     // The back-projection plane distance (for interpolation)
     // between the preset near and far clipping planes.
     private float _interpolationPreference = 0.9f;
-    
+
     // Cached state variables
     private ScreenOrientation _lastOrientation;
     private int _lastTargetWidth, _lastTargetHeight;
@@ -122,7 +122,7 @@ namespace Niantic.ARDK.AR.Awareness
       {
         // Release the previous buffer, if any
         AwarenessBuffer?.Dispose();
-        
+
         // Cache a copy of the new buffer
         AwarenessBuffer = buffer.GetCopy() as TBuffer;
       }
@@ -137,7 +137,7 @@ namespace Niantic.ARDK.AR.Awareness
       if (isFirstUpdate)
       {
         _didReceiveFirstUpdate = true;
-        
+
         // Calculate an affine matrix that transforms from the AR image's
         // aspect ratio and orientation to the buffer's coordinate space.
         var arImageResolution = frame.Camera.ImageResolution;
@@ -146,7 +146,7 @@ namespace Niantic.ARDK.AR.Awareness
           arImageResolution.width,
           arImageResolution.height
         );
-        
+
         // Propagate the event for when the context awareness feature initialized
         _awarenessStreamBegan?.Invoke(new ContextAwarenessArgs<TBuffer>(this));
       }
@@ -156,14 +156,14 @@ namespace Niantic.ARDK.AR.Awareness
         _lastOrientation != targetOrientation ||
         _lastTargetWidth != targetResolution.width ||
         _lastTargetHeight != targetResolution.height;
-      
+
       if (isDisplayTransformDirty)
       {
         _lastOrientation = targetOrientation;
         _lastTargetWidth = targetResolution.width;
         _lastTargetHeight = targetResolution.height;
 
-        // Calculate an affine matrix that transforms normalized coordinates from the 
+        // Calculate an affine matrix that transforms normalized coordinates from the
         // viewport's aspect ratio and orientation to the buffer's coordinate space.
         _displayTransform = _arImageToBufferTransform * frame.CalculateDisplayTransform
         (
@@ -177,7 +177,7 @@ namespace Niantic.ARDK.AR.Awareness
       // interpolation is on, we calculate a matrix to correct for the
       // displacement that occured between the beginning of inference
       // and the current pose of the AR driven camera.
-      // We only need to update the interpolation transform either if 
+      // We only need to update the interpolation transform either if
       // there is a new buffer or if it's set to be updated every frame
       var isInterpolationTransformDirty =
         (InterpolationMode == InterpolationMode.Balanced && didUpdateAwarenessBuffer) ||
@@ -213,29 +213,29 @@ namespace Niantic.ARDK.AR.Awareness
         // Note: we don't need to flip cy here, because the
         // display transform already contains a vertical inversion.
         var intrinsics = GetNormalizedIntrinsics(AwarenessBuffer);
-        
+
         // The inverse of this matrix can be used to back project 2D points in 3D.
         // Additionally, we multiply with the depth buffer's display transform to
         // allow the matrix to be used with normalized viewport coordinates.
         BackProjectionTransform = Matrix4x4.Inverse(intrinsics) * _displayTransform;
       }
-      
-      // This state variable represents whether the current representation of the 
-      // context awareness buffer is altered, i.e. the contents of the buffer 
+
+      // This state variable represents whether the current representation of the
+      // context awareness buffer is altered, i.e. the contents of the buffer
       // changes or it needs to be mapped to the screen differently.
       var isRepresentationDirty = didUpdateAwarenessBuffer || isSamplerTransformDirty;
-      
+
       #if CONTEXT_AWARENESS_USE_INFERENCE_TIME_CAMERA
       // When CONTEXT_AWARENESS_USE_INFERENCE_TIME_CAMERA is defined,
       // the CameraToWorldTransform is only updated when there was a
-      // change in the buffer's representation. As a result, when 
+      // change in the buffer's representation. As a result, when
       // back-projecting values (e.g. depth) from a screen point,
       // the result will be calculated from where the screen point
       // was the last time when the buffer was updated instead of
       // where the screen point is currently.
-      if (isRepresentationDirty) 
+      if (isRepresentationDirty)
       #endif
-      
+
       // The camera to world matrix is the inverted view matrix,
       // matching the orientation of the buffer. It is used
       // to transform points from camera space to world space.
@@ -253,7 +253,7 @@ namespace Niantic.ARDK.AR.Awareness
         );
       }
     }
-    
+
     private Color[] _pixelBufferColor;
     private float[] _pixelBufferFloat;
 
@@ -345,7 +345,7 @@ namespace Niantic.ARDK.AR.Awareness
       if(disposing)
         AwarenessBuffer?.Dispose();
     }
-    
+
     ~AwarenessBufferProcessor()
     {
       Dispose(false);
@@ -368,7 +368,7 @@ namespace Niantic.ARDK.AR.Awareness
 
       return result;
     }
-    
+
     private static Vector2Int CalculateContainerResolution(IAwarenessBuffer forBuffer, ScreenOrientation usingOrientation)
     {
       // Inspect the buffer
@@ -376,13 +376,21 @@ namespace Niantic.ARDK.AR.Awareness
       var bufferHeight = (int)forBuffer.Height;
 
       var bufferOrientation = bufferWidth > bufferHeight
+#if UNITY_2021_3_OR_NEWER
         ? ScreenOrientation.LandscapeLeft
+#else
+        ? ScreenOrientation.Landscape
+#endif
         : ScreenOrientation.Portrait;
-      
+
       var targetOrientation =
         usingOrientation == ScreenOrientation.LandscapeLeft ||
         usingOrientation == ScreenOrientation.LandscapeRight
+#if UNITY_2021_3_OR_NEWER
           ? ScreenOrientation.LandscapeLeft
+#else
+          ? ScreenOrientation.Landscape
+#endif
           : ScreenOrientation.Portrait;
 
       var rotateContainer = bufferOrientation != targetOrientation;
@@ -407,9 +415,15 @@ namespace Niantic.ARDK.AR.Awareness
         ARLog._Error("This texture has already been allocated with a different format.");
         return false;
       }
-      
+
       if (texture.width != width || texture.height != height)
+      {
+#if UNITY_2021_2_OR_NEWER
         texture.Reinitialize(width, height);
+#else
+        texture.Resize(width, height);
+#endif
+      }
 
       return true;
     }

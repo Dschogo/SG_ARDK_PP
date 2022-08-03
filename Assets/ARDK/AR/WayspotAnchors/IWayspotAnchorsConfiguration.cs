@@ -31,7 +31,7 @@ namespace Niantic.ARDK.AR.WayspotAnchors
     /// The default value is 3.0
     float GoodTrackingWait { get; set; }
 
-    /// The max number of wayspot anchor resolutions  per second 
+    /// The boolean specifying whether continuous localization is enabled
     /// The default value is false
     bool ContinuousLocalizationEnabled { get; set; }
 

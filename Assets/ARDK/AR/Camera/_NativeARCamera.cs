@@ -11,7 +11,7 @@ using UnityEngine;
 namespace Niantic.ARDK.AR.Camera
 {
   internal sealed class _NativeARCamera:
-    IARCamera
+    IUpdatableARCamera
   {
     // tracking peerState + tracking peerState reason + image resolution + transform +
     // projection matrix + view matrix
@@ -350,6 +350,20 @@ namespace Niantic.ARDK.AR.Camera
       return new Vector2(outPoint[0], outPoint[1]);
     }
 
+    public void UpdateDisplayGeometry(ScreenOrientation orientation, int viewportWidth, int viewportHeight)
+    {
+      if (NativeAccess.Mode == NativeAccess.ModeType.Native)
+      {
+        _NARCamera_UpdateDisplayGeometry
+        (
+          _nativeHandle,
+          (UInt64)orientation,
+          viewportWidth,
+          viewportHeight
+        );
+      }
+    }
+
     private bool _isTrackingStateLoaded;
     // Populates the tracking state and reason.
     private void _PopulateTrackingStateIfNeeded()
@@ -449,6 +463,15 @@ namespace Niantic.ARDK.AR.Camera
       Int32 viewportWidth,
       Int32 viewportHeight,
       float[] outPoint
+    );
+
+    [DllImport(_ARDKLibrary.libraryName)]
+    private static extern void _NARCamera_UpdateDisplayGeometry
+    (
+      IntPtr nativeHandle,
+      UInt64 interfaceOrientation,
+      Int32 viewportWidth,
+      Int32 viewportHeight
     );
   }
 }
