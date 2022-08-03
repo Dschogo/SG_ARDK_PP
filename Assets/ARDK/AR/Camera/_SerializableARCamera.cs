@@ -10,7 +10,7 @@ namespace Niantic.ARDK.AR.Camera
 {
   [Serializable]
   internal sealed class _SerializableARCamera:
-    IARCamera
+    IUpdatableARCamera
   {
     internal _SerializableARCamera()
     {
@@ -93,6 +93,15 @@ namespace Niantic.ARDK.AR.Camera
     void IDisposable.Dispose()
     {
       // Do nothing. This object is fully managed.
+    }
+
+    public void UpdateDisplayGeometry
+    (
+      ScreenOrientation orientation,
+      int viewportWidth,
+      int viewportHeight)
+    {
+      // Do nothing. No need to update display geometry.
     }
   }
 }

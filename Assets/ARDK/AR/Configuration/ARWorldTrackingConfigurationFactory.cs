@@ -2,8 +2,6 @@
 
 using System;
 
-using Niantic.ARDK.AR.Awareness.Depth.Generators;
-
 namespace Niantic.ARDK.AR.Configuration
 {
   public static class ARWorldTrackingConfigurationFactory

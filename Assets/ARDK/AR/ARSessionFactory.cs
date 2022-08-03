@@ -41,9 +41,9 @@ namespace Niantic.ARDK.AR
     ///   The identifier used by the C++ library to connect all related components.
     ///
     /// @returns The created session, or null if it was not possible to create a session.
-    public static IARSession Create(RuntimeEnvironment env, Guid stageIdentifier = default(Guid))
+    public static IARSession Create(RuntimeEnvironment env, Guid stageIdentifier = default)
     {
-      if (stageIdentifier == default(Guid))
+      if (stageIdentifier == default)
         stageIdentifier = Guid.NewGuid();
 
       IARSession result;
@@ -162,7 +162,7 @@ namespace Niantic.ARDK.AR
     internal static IARSession _Create
     (
       IEnumerable<RuntimeEnvironment> envs = null,
-      Guid stageIdentifier = default(Guid)
+      Guid stageIdentifier = default
     )
     {
       bool triedAtLeast1 = false;

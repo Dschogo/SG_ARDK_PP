@@ -156,7 +156,11 @@ namespace Niantic.ARDK.AR.Awareness.Depth.Generators
         (
           MathUtils.CalculateScreenRotation
           (
+#if UNITY_2021_3_OR_NEWER
             from: ScreenOrientation.LandscapeLeft,
+#else
+            from: ScreenOrientation.Landscape,
+#endif
             to: RenderTarget.ScreenOrientation
           ) * depthBuffer.ViewMatrix
         ).inverse;

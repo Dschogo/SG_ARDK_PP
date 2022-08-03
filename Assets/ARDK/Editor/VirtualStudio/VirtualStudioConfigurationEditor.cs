@@ -19,17 +19,17 @@ namespace Niantic.ARDK.VirtualStudio.Editor
 {
   public sealed class VirtualStudioConfigurationEditor : EditorWindow
   {
-    private const string VS_MODE_KEY = "ARDK_VirtualStudio_Mode";
-
-    private int _vsModeSelection;
-    private RuntimeEnvironment _selectedARInfoSource;
+    // "None" tab correlates to RuntimeEnvironment.Native (as in nothing running in Virtual Studio),
+    // so _vsModeTabSelection == (int)currRuntimeEnvironment - 1
+    private static readonly string[] _modeSelectionGridStrings = { "None", "Remote", "Mock" };
+    private int _vsModeTabSelection;
 
     [SerializeField]
     private _RemoteConfigurationEditor _remoteConfigEditor;
 
     [SerializeField]
     private _MockPlayConfigurationEditor _mockPlayConfigEditor;
-    
+
     private static GUIStyle _headerStyle;
 
     internal static GUIStyle _HeaderStyle
@@ -90,27 +90,18 @@ namespace Niantic.ARDK.VirtualStudio.Editor
       window._mockPlayConfigEditor = new _MockPlayConfigurationEditor();
       window._remoteConfigEditor = new _RemoteConfigurationEditor();
 
-      window.LoadPreferences();
+      window.ApplyModeChange();
     }
 
-    private void LoadPreferences()
+    private void ApplyModeChange()
     {
-      // Valid ARInfoSource values start at 1
-      _vsModeSelection = PlayerPrefs.GetInt(VS_MODE_KEY, 0);
-      _selectedARInfoSource = (RuntimeEnvironment) _vsModeSelection + 1;
+      var currentRuntime = _VirtualStudioLauncher.SelectedMode;
 
-      _remoteConfigEditor.OnSelectionChange(_selectedARInfoSource == RuntimeEnvironment.Remote);
-      _mockPlayConfigEditor.OnSelectionChange(_selectedARInfoSource == RuntimeEnvironment.Mock);
+      // Valid RuntimeEnvironment values start at 1
+      _vsModeTabSelection = (int)currentRuntime - 1;
 
-      switch (_selectedARInfoSource)
-      {
-        case RuntimeEnvironment.Mock:
-          _mockPlayConfigEditor.LoadPreferences();
-          break;
-        case RuntimeEnvironment.Remote:
-          _remoteConfigEditor.LoadPreferences();
-          break;
-      }
+      _remoteConfigEditor.OnSelectionChange(currentRuntime == RuntimeEnvironment.Remote);
+      _mockPlayConfigEditor.OnSelectionChange(currentRuntime == RuntimeEnvironment.Mock);
     }
 
     private void OnGUI()
@@ -127,16 +118,16 @@ namespace Niantic.ARDK.VirtualStudio.Editor
 
         GUILayout.Space(50);
 
-        switch (_selectedARInfoSource)
+        switch (_VirtualStudioLauncher.SelectedMode)
         {
           case RuntimeEnvironment.Remote:
-            EditorGUILayout.LabelField("Remote Connection", _HeaderStyle);
+            EditorGUILayout.LabelField("Remote Mode - USB", _HeaderStyle);
             GUILayout.Space(10);
             _remoteConfigEditor.DrawGUI();
             break;
 
           case RuntimeEnvironment.Mock:
-            EditorGUILayout.LabelField("Mock Play Configuration", _HeaderStyle);
+            EditorGUILayout.LabelField("Mock Mode", _HeaderStyle);
             GUILayout.Space(10);
             _mockPlayConfigEditor.DrawGUI();
             break;
@@ -144,23 +135,22 @@ namespace Niantic.ARDK.VirtualStudio.Editor
       }
     }
 
-    private static readonly string[] _modeSelectionGridStrings = { "None", "Remote", "Mock" };
     private void DrawEnabledGUI()
     {
       var newModeSelection =
         GUI.SelectionGrid
         (
           new Rect(10, 20, 300, 20),
-          _vsModeSelection,
+          _vsModeTabSelection,
           _modeSelectionGridStrings,
           3
         );
 
-      if (newModeSelection != _vsModeSelection)
+      if (newModeSelection != _vsModeTabSelection)
       {
-        _vsModeSelection = newModeSelection;
-        PlayerPrefs.SetInt(VS_MODE_KEY, _vsModeSelection);
-        LoadPreferences();
+        _vsModeTabSelection = newModeSelection;
+        _VirtualStudioLauncher.SelectedMode = (RuntimeEnvironment)(_vsModeTabSelection + 1);
+        ApplyModeChange();
       }
     }
   }

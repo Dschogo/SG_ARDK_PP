@@ -202,12 +202,12 @@ namespace Niantic.ARDK.AR.WayspotAnchors
     {
       while (!_isDisposed)
       {
+        await SimulateServerWork();
         if (_localizationState != LocalizationState.Localized)
         {
           await Task.Delay(1);
           continue;
         }
-        await SimulateServerWork();
         var resolutions = new List<WayspotAnchorResolvedArgs>();
         foreach (var id in resolvedWayspotAnchors)
         {

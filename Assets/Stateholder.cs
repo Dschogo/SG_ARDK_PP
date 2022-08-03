@@ -8,4 +8,6 @@ public class Stateholder : MonoBehaviour
     public static POI[] pois;
 
     public static int radius = 25; //in meters
+
+    public static int curr_schnitzel_counter = 0;
 }

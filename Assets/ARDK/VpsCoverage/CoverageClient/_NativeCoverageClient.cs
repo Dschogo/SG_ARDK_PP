@@ -1,4 +1,4 @@
-// Copyright 2022 Niantic, Inc. All Rights Reserved.
+﻿// Copyright 2022 Niantic, Inc. All Rights Reserved.
 
 using System;
 using System.Collections.Generic;
@@ -8,6 +8,7 @@ using Niantic.ARDK.Configuration;
 using Niantic.ARDK.Configuration.Internal;
 using Niantic.ARDK.LocationService;
 using Niantic.ARDK.Utilities;
+using Niantic.ARDK.Utilities.Logging;
 using Niantic.ARDK.VPSCoverage.GeoserviceMessages;
 
 using UnityEditor;
@@ -45,6 +46,8 @@ namespace Niantic.ARDK.VPSCoverage
       var metadata = ArdkGlobalConfig._Internal.GetCommonDataEnvelopeWithRequestIdAsStruct();
       var header =  ArdkGlobalConfig._Internal.GetApiGatewayHeader();
 
+      ARLog._Debug(JsonUtility.ToJson(metadata, true));
+      
       if (Input.location.status == LocationServiceStatus.Running)
       {
          int distanceToQuery = (int)queryLocation.Distance(new LatLng(Input.location.lastData));
@@ -84,6 +87,8 @@ namespace Niantic.ARDK.VPSCoverage
       var metadata = ArdkGlobalConfig._Internal.GetCommonDataEnvelopeWithRequestIdAsStruct();
       var header =  ArdkGlobalConfig._Internal.GetApiGatewayHeader();
 
+      ARLog._Debug(JsonUtility.ToJson(metadata, true));
+      
       _LocalizationTargetsRequest request = new _LocalizationTargetsRequest(targetIdentifiers, metadata);
 
       _HttpResponse<_LocalizationTargetsResponse> response =

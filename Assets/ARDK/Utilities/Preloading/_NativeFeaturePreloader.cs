@@ -64,7 +64,7 @@ namespace Niantic.ARDK.Utilities.Preloading
     {
       // Todo: This should really be done in native
       if (features.Contains(Feature.Dbow) && string.IsNullOrEmpty(ArdkGlobalConfig.GetDbowUrl()))
-        ArdkGlobalConfig.SetDbowUrl(ArdkGlobalConfig._DBOW_URL);
+        ArdkGlobalConfig.SetDbowUrl(ArdkGlobalConfig._DbowUrl);
 
       UInt32[] featuresInts = Array.ConvertAll(features, value => (UInt32) value);
       _NAR_ARDKFilePreloader_Download(_nativeHandle, featuresInts, featuresInts.Length);

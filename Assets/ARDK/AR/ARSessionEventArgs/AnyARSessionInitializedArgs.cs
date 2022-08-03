@@ -14,7 +14,7 @@ namespace Niantic.ARDK.AR.ARSessionEventArgs
       _IsLocal = isLocal;
     }
 
-    public IARSession Session { get; private set; }
+    public IARSession Session { get; }
 
     internal bool _IsLocal { get; }
   }

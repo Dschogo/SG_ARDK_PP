@@ -9,16 +9,26 @@ public class image : MonoBehaviour
     [SerializeField] private GameObject canvas;
     private bool big = false;
     private Vector3 my_transform;
+    byte[] bytes;
     // Start is called before the first frame update
     void Start()
     {
         RawImage img = GetComponent<RawImage>();
         my_transform = this.transform.position;
-        if (Stateholder.pois[Stateholder.curr_poi].image != null && Stateholder.pois[Stateholder.curr_poi].image != "")
+        if ((Stateholder.pois[Stateholder.curr_poi].image != null && Stateholder.pois[Stateholder.curr_poi].image != "")
+         || (Stateholder.pois[Stateholder.curr_poi].following[Stateholder.curr_schnitzel_counter - 1].image != null && Stateholder.pois[Stateholder.curr_poi].following[Stateholder.curr_schnitzel_counter - 1].image != ""))
         {
             try
             {
-                byte[] bytes = System.Convert.FromBase64String(Stateholder.pois[Stateholder.curr_poi].image.Split(',')[1]);
+
+                if (Stateholder.curr_schnitzel_counter > 0)
+                {
+                    bytes = System.Convert.FromBase64String(Stateholder.pois[Stateholder.curr_poi].image.Split(',')[1]);
+                }
+                else
+                {
+                    bytes = System.Convert.FromBase64String(Stateholder.pois[Stateholder.curr_poi].image.Split(',')[1]);
+                }
                 Texture2D tex = new Texture2D(1, 1);
                 tex.LoadImage(bytes);
                 tex.Apply();
@@ -47,7 +57,7 @@ public class image : MonoBehaviour
         }
         else
         {
-            this.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
+            this.transform.localScale = new Vector3(4f, 4f, 1f);
             this.transform.position = canvas.transform.position;
             big = true;
         }

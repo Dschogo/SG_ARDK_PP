@@ -118,7 +118,7 @@ namespace Niantic.ARDK.AR.Networking
       if (string.IsNullOrEmpty(ArdkGlobalConfig.GetDbowUrl()))
       {
         ARLog._Debug("DBOW URL was not set. The default URL will be used.");
-        ArdkGlobalConfig.SetDbowUrl(ArdkGlobalConfig._DBOW_URL);
+        ArdkGlobalConfig.SetDbowUrl(ArdkGlobalConfig._DbowUrl);
       }
 
       if (arSession.StageIdentifier != networking.StageIdentifier)

@@ -32,7 +32,7 @@ namespace Niantic.ARDK.Internals
   {
     // Add a destructor to this class to try and catch editor reloads
     private static readonly _Destructor Finalise = new _Destructor();
-    
+
     // The pointer to the C++ NarSystemBase handling functionality at the native level
     private static IntPtr _nativeHandle = IntPtr.Zero;
 
@@ -43,7 +43,7 @@ namespace Niantic.ARDK.Internals
     private static void EditorStartup()
     {
       EnforceRosettaBasedCompatibility();
-      
+
 #if !REQUIRE_MANUAL_STARTUP
       ManualStartup();
 #endif
@@ -109,7 +109,7 @@ namespace Niantic.ARDK.Internals
     private static void SetAuthenticationParameters()
     {
       // We always try to find an api key
-      var apiKey = "";
+      var apiKey = string.Empty;
       var authConfigs = Resources.LoadAll<ArdkAuthConfig>("ARDK/ArdkAuthConfig");
 
       if (authConfigs.Length > 1)
@@ -131,6 +131,7 @@ namespace Niantic.ARDK.Internals
       {
         var authConfig = authConfigs[0];
         apiKey = authConfig.ApiKey;
+
         if (!string.IsNullOrEmpty(apiKey))
           ArdkGlobalConfig.SetApiKey(apiKey);
       }
@@ -151,15 +152,9 @@ namespace Niantic.ARDK.Internals
         }
         else
         {
-          ARLog._ErrorFormat
+          ARLog._Error
           (
-            "No API Key was found. Add it to the {0} file. {1}",
-#if UNITY_EDITOR
-            AssetDatabase.GetAssetPath(authConfigs[0]),
-#else
-            "Resources/ARDK/ArdkAuthConfig.asset",
-#endif
-            AUTH_DOCS_MSG
+            "No API Key was found. Add it to an ArdkAuthConfig asset. "  + AUTH_DOCS_MSG
           );
         }
       }
@@ -167,7 +162,7 @@ namespace Niantic.ARDK.Internals
       var authUrl = ArdkGlobalConfig.GetAuthenticationUrl();
       if (string.IsNullOrEmpty(authUrl))
       {
-        ArdkGlobalConfig.SetAuthenticationUrl(ArdkGlobalConfig._DEFAULT_AUTH_URL);
+        ArdkGlobalConfig.SetAuthenticationUrl(ArdkGlobalConfig._DefaultAuthUrl);
         authUrl = ArdkGlobalConfig.GetAuthenticationUrl();
       }
 
@@ -195,11 +190,7 @@ namespace Niantic.ARDK.Internals
     private static void SetDeviceMetadata()
     {
       ArdkGlobalConfig._Internal.SetApplicationId(Application.identifier);
-
-      var guid = Guid.NewGuid();
-      // Formats as a hex string without "0x" (ie: 0123456789ABCDEF0123456789ABCDEF)
-      var guidAsHexString = $"{guid.ToString("N").ToUpper()}";
-      ArdkGlobalConfig._Internal.SetArdkInstanceId(guidAsHexString);
+      ArdkGlobalConfig._Internal.SetArdkInstanceId(_ArdkMetadataConfigExtension._CreateFormattedGuid());
     }
 
     // TODO(bpeake): Find a way to shutdown gracefully and add shutdown here.
@@ -214,14 +205,14 @@ namespace Niantic.ARDK.Internals
 
       bool hasM1ProcessorOrHasOSBelowBigSur = _IsM1Processor() || !_IsOperatingSystemBigSurAndAbove();
       bool isMacNotCompatibleForNative = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && hasM1ProcessorOrHasOSBelowBigSur;
-      
-      if (isMacNotCompatibleForNative || 
+
+      if (isMacNotCompatibleForNative ||
           RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
       {
         // return 0 as native handler for windows, m1 macbooks and macbooks below BigSur
         return IntPtr.Zero;
       }
-      
+
       // for everything else initialise nar base system
       return _InitialiseNarSystem();
 #endif
@@ -235,7 +226,7 @@ namespace Niantic.ARDK.Internals
       return IntPtr.Zero;
 #endif
     }
-    
+
     private static readonly Dictionary<string, string> _rosettaFiles = new Dictionary<string, string>()
     {
       {"mcs", "/ARDK/mcs.rsp"},
@@ -247,7 +238,7 @@ namespace Niantic.ARDK.Internals
     {
       if (_rosettaCompatibilityCheckPerformed)
         return;
-      
+
 #if UNITY_EDITOR
       if (_IsUsingRosetta())
       {
@@ -257,15 +248,15 @@ namespace Niantic.ARDK.Internals
       {
         _DisableRosettaFiles();
       }
-#endif 
+#endif
       _rosettaCompatibilityCheckPerformed = true;
     }
-    
+
 #if UNITY_EDITOR
     private static void _EnableRosettaFiles()
     {
       ARLog._Debug("Enabling the files for rosetta compatibility");
-      
+
       foreach (var rosettaFile in _rosettaFiles)
       {
         var disabledFileName = rosettaFile.Value + FileDisablingSuffix;
@@ -292,7 +283,7 @@ namespace Niantic.ARDK.Internals
     private static void _EnableFileWithRename(string sourcePath)
     {
       string newPath = sourcePath.Substring(0, sourcePath.Length - FileDisablingSuffix.Length);
-      
+
       if (File.Exists(newPath))
       {
         ARLog._Debug($"File with name {newPath} already exists. So cleaning it up");
@@ -300,10 +291,10 @@ namespace Niantic.ARDK.Internals
       }
 
       File.Move(sourcePath, newPath);
-      
+
       RemoveMetaFile(sourcePath);
     }
-    
+
     private static void _DisableFileWithRename(string sourcePath)
     {
       string newPath = sourcePath + FileDisablingSuffix;
@@ -315,7 +306,7 @@ namespace Niantic.ARDK.Internals
       }
 
       File.Move(sourcePath, newPath);
-      
+
       RemoveMetaFile(sourcePath);
     }
 
@@ -337,7 +328,7 @@ namespace Niantic.ARDK.Internals
         // sanity check
         if (path.Length < pathInArdk.Length)
           continue;
-        
+
         // Get the last characters to compare with the pathInArdk string
         var finalSubstring = path.Substring(path.Length - pathInArdk.Length);
         if (finalSubstring.Equals(pathInArdk))
@@ -350,7 +341,7 @@ namespace Niantic.ARDK.Internals
     }
 
 #endif
-    
+
     private sealed class _Destructor
     {
       ~_Destructor()
@@ -360,22 +351,22 @@ namespace Niantic.ARDK.Internals
     }
 
 #if (AR_NATIVE_SUPPORT || UNITY_EDITOR_OSX)
-    
+
     // TODO AR-10581 Consolidate OS branching logic from here and from ArdkGlobalConfig
     private static bool _IsOperatingSystemBigSurAndAbove()
     {
-      // https://en.wikipedia.org/wiki/Darwin_%28operating_system%29#Release_history 
+      // https://en.wikipedia.org/wiki/Darwin_%28operating_system%29#Release_history
       // 20.0.0 Darwin is the first version of BigSur
       return Environment.OSVersion.Version >= new Version(20, 0, 0);
     }
-    
+
     private static bool _IsUsingRosetta()
     {
-      return 
-        _IsM1Processor() && 
+      return
+        _IsM1Processor() &&
         RuntimeInformation.ProcessArchitecture == Architecture.X64;
     }
-    
+
     private static bool _IsM1Processor()
     {
       /*
@@ -391,10 +382,10 @@ namespace Niantic.ARDK.Internals
 
       return result >= 0;
     }
-    
+
     [DllImport("libSystem.dylib")]
     private static extern int sysctlbyname ([MarshalAs(UnmanagedType.LPStr)]string name, out int int_val, ref IntPtr length, IntPtr newp, IntPtr newlen);
-    
+
     [DllImport(_ARDKLibrary.libraryName)]
     private static extern void _ROR_CREATE_STARTUP_SYSTEMS();
 
@@ -419,7 +410,7 @@ namespace Niantic.ARDK.Internals
     {
       return false;
     }
-    
+
 #endif
   }
 }

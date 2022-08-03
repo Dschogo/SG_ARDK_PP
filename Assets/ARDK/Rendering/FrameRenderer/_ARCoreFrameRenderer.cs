@@ -20,19 +20,11 @@ namespace Niantic.ARDK.Rendering
     // Rendering resources
     private CommandBuffer _commandBuffer;
     private Texture2D _nativeTexture;
-    private RenderTexture _cachedTexture;
     protected override Shader Shader { get; }
-    
-    // Resources for caching external textures
-    private readonly Shader _blitShader;
-    private Material _blitMaterial;
 
     public _ARCoreFrameRenderer(RenderTarget target)
       : base(target)
     {
-      // The blitting shader used for caching
-      _blitShader = Resources.Load<Shader>("ExternalBlit");
-      
       // The main shader used for rendering the background
       Shader = Resources.Load<Shader>("ARCoreFrame");
     }
@@ -45,9 +37,6 @@ namespace Niantic.ARDK.Rendering
       Shader customShader = null
     ) : base(target, near, far)
     {
-      // The blitting shader used for caching
-      _blitShader = Resources.Load<Shader>("ExternalBlit");
-      
       // The main shader used for rendering the background
       Shader = customShader ? customShader : Resources.Load<Shader>("ARCoreFrame");
       ARLog._Debug("Loaded: " + (Shader != null ? Shader.name : null));
@@ -61,25 +50,6 @@ namespace Niantic.ARDK.Rendering
       Material renderMaterial
     )
     {
-      _blitMaterial = new Material(_blitShader)
-      {
-        hideFlags = HideFlags.HideAndDontSave
-      };
-      
-      // Allocate the texture cache for double buffering
-      _cachedTexture = new RenderTexture
-      (
-        sourceResolution.width,
-        sourceResolution.height,
-        0,
-        RenderTextureFormat.ARGB32
-      )
-      {
-        useMipMap = false, autoGenerateMips = false, filterMode = FilterMode.Point, anisoLevel = 0
-      };
-      
-      _cachedTexture.Create();
-      
       _commandBuffer = new CommandBuffer
       {
         name = "ARCoreFrameRenderer"
@@ -126,16 +96,9 @@ namespace Niantic.ARDK.Rendering
         TextureFormat.ARGB32,
         frame.CapturedImageTextures[0]
       );
-      
-      // On Android, the native texture is prone to change
-      // during rendering, so we work with a copy that we own.
-      _blitMaterial.SetTexture(PropertyBindings.FullImage, _nativeTexture);
-      var prevTarget = RenderTexture.active;
-      Graphics.Blit(null, _cachedTexture, _blitMaterial);
-      RenderTexture.active = prevTarget;
 
       // Bind texture and the display transform
-      material.SetTexture(PropertyBindings.FullImage, _cachedTexture);
+      material.SetTexture(PropertyBindings.FullImage, _nativeTexture);
       material.SetMatrix(PropertyBindings.DisplayTransform, displayTransform);
 
       return true;
@@ -149,15 +112,9 @@ namespace Niantic.ARDK.Rendering
     protected override void OnRelease()
     {
       _commandBuffer?.Dispose();
-      
-      if (_cachedTexture != null)
-        Object.Destroy(_cachedTexture);
 
       if (_nativeTexture != null)
         Object.Destroy(_nativeTexture);
-      
-      if (_blitMaterial != null)
-        Object.Destroy(_blitMaterial);
     }
     
     // Does nothing but returning from an IssuePluginEvent has the effect of Unity resetting all 

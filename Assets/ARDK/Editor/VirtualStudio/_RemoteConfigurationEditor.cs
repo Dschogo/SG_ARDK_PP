@@ -15,72 +15,12 @@ namespace Niantic.ARDK.VirtualStudio.Editor
   [Serializable]
   internal sealed class _RemoteConfigurationEditor
   {
-    private const string REMOTE_METHOD = "ARDK_Connection_Method";
-    private const string REMOTE_PIN = "ARDK_Pin";
-
-    [SerializeField]
-    private _RemoteConnection.ConnectionMethod _connectionMethod;
-
-    [SerializeField]
-    private string _pin;
-
-    [SerializeField]
-    private int _imageCompression;
-
-    [SerializeField]
-    private int _imageFramerate;
-
-    [SerializeField]
-    private int _awarenessFramerate;
-
-    [SerializeField]
-    private int _featurePointFramerate;
-
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void Startup()
+    private _RemoteModeLauncher Launcher
     {
-      if (!_RemoteConnection.IsEnabled)
-        return;
-
-      if (Application.isPlaying)
+      get
       {
-        var pin = PlayerPrefs.GetString(REMOTE_PIN, "").ToUpper();
-        var connectionMethod =
-          (_RemoteConnection.ConnectionMethod) PlayerPrefs.GetInt
-          (
-            REMOTE_METHOD,
-            (int)_RemoteConnection.ConnectionMethod.Internet
-          );
-
-        var pinExistsAndIsValid = (!string.IsNullOrEmpty(pin) && Regex.IsMatch(pin, @"^[a-zA-Z]{6}$"));
-        if (pinExistsAndIsValid || connectionMethod == _RemoteConnection.ConnectionMethod.USB)
-        {
-          _RemoteConnection.InitIfNone(connectionMethod);
-          _RemoteConnection.Connect(pin);
-        }
-        else
-        {
-          ARLog._Release("Unable to create remote connection: No pin entered for Internet connection");
-        }
+        return (_RemoteModeLauncher)_VirtualStudioLauncher.GetOrCreateModeLauncher(RuntimeEnvironment.Remote);
       }
-    }
-
-    public void LoadPreferences()
-    {
-      _pin = PlayerPrefs.GetString(REMOTE_PIN, "");
-
-      _connectionMethod =
-        (_RemoteConnection.ConnectionMethod)PlayerPrefs.GetInt
-        (
-          REMOTE_METHOD,
-          (int)_RemoteConnection.ConnectionMethod.Internet
-        );
-
-      _imageCompression = _RemoteBufferConfiguration.ImageCompression;
-      _imageFramerate = _RemoteBufferConfiguration.ImageFramerate;
-      _awarenessFramerate = _RemoteBufferConfiguration.AwarenessFramerate;
-      _featurePointFramerate = _RemoteBufferConfiguration.FeaturePointFramerate;
-
     }
 
     public void OnSelectionChange(bool isSelected)
@@ -88,100 +28,76 @@ namespace Niantic.ARDK.VirtualStudio.Editor
       _RemoteConnection.IsEnabled = isSelected;
     }
 
+    private GUIStyle _statusStyle;
+    private GUIStyle StatusStyle
+    {
+      get
+      {
+        if (_statusStyle == null)
+        {
+          _statusStyle = new GUIStyle(EditorStyles.largeLabel);
+          _statusStyle.fontSize = 20;
+          _statusStyle.fixedHeight = 30;
+        }
+
+        return _statusStyle;
+      }
+    }
+
     public void DrawGUI()
     {
       EditorGUI.BeginDisabledGroup(Application.isPlaying);
 
-      var newConnectionMethod =
-        (_RemoteConnection.ConnectionMethod) EditorGUILayout.EnumPopup("Method:", _connectionMethod);
+      var newImageCompression = EditorGUILayout.IntField("Image Compression:", Launcher.ImageCompression);
+      if (newImageCompression != Launcher.ImageCompression)
+        Launcher.ImageCompression = newImageCompression;
 
-      if (newConnectionMethod != _connectionMethod)
-      {
-        _connectionMethod = newConnectionMethod;
-        PlayerPrefs.SetInt(REMOTE_METHOD, (int)_connectionMethod);
-      }
+      var newImageFramerate = EditorGUILayout.IntField("Image Framerate:", Launcher.ImageFramerate);
+      if (newImageFramerate != Launcher.ImageFramerate)
+        Launcher.ImageFramerate = newImageFramerate;
 
-      var newPin = EditorGUILayout.TextField("PIN:", _pin);
-      var newPinIsValid = Regex.IsMatch(newPin, @"^[a-zA-Z]{6}$");
-      if (!newPinIsValid)
-      {
-        EditorGUILayout.HelpBox("Pin must be a string of 6 letters ", MessageType.Warning);
-      }
+      var newAwarenessFramerate = EditorGUILayout.IntField("Awareness Framerate:", Launcher.AwarenessFramerate);
+      if (newAwarenessFramerate != Launcher.AwarenessFramerate)
+        Launcher.AwarenessFramerate = newAwarenessFramerate;
 
-      if (newPin != _pin)
-      {
-        _pin = newPin;
-        PlayerPrefs.SetString(REMOTE_PIN, newPin);
-      }
-
-      var newImageCompression = EditorGUILayout.IntField("Image Compression:", _imageCompression);
-      if (newImageCompression != _imageCompression)
-      {
-        _imageCompression = newImageCompression;
-        _RemoteBufferConfiguration.ImageCompression = newImageCompression;
-      }
-
-      var newImageFramerate = EditorGUILayout.IntField("Image Framerate:", _imageFramerate);
-      if (newImageFramerate != _imageFramerate)
-      {
-        _imageFramerate = newImageFramerate;
-        _RemoteBufferConfiguration.ImageFramerate = newImageFramerate;
-      }
-
-      var newAwarenessFramerate = EditorGUILayout.IntField("Awareness Framerate:", _awarenessFramerate);
-      if (newAwarenessFramerate != _imageFramerate)
-      {
-        _awarenessFramerate = newAwarenessFramerate;
-        _RemoteBufferConfiguration.AwarenessFramerate = newAwarenessFramerate;
-      }
-      
-      var newFeaturePointFramerate = EditorGUILayout.IntField("Feature Point Framerate:", _featurePointFramerate);
-      if (newFeaturePointFramerate != _imageFramerate)
-      {
-        _featurePointFramerate = newFeaturePointFramerate;
-        _RemoteBufferConfiguration.FeaturePointFramerate = newFeaturePointFramerate;
-      }
+      var newFeaturePointFramerate = EditorGUILayout.IntField("Feature Point Framerate:", Launcher.FeaturePointFramerate);
+      if (newFeaturePointFramerate != Launcher.FeaturePointFramerate)
+        Launcher.FeaturePointFramerate = newFeaturePointFramerate;
 
       EditorGUI.EndDisabledGroup();
 
-      GUIStyle s = new GUIStyle(EditorStyles.largeLabel);
-      s.fontSize = 20;
-      s.fixedHeight = 30;
+      GUILayout.Space(20);
 
       if (Application.isPlaying)
       {
-        EditorGUILayout.LabelField(_RemoteConnection.CurrentConnectionMethod.ToString());
-
         if (!_RemoteConnection.IsReady)
         {
           if (_RemoteConnection.IsEnabled)
           {
-            s.normal.textColor = Color.magenta;
-            EditorGUILayout.LabelField("Waiting for Remote Connection to be ready...", s);
+            StatusStyle.normal.textColor = Color.magenta;
+            EditorGUILayout.LabelField("Waiting for Remote Connection to be ready", StatusStyle);
           }
           else
           {
-            s.normal.textColor = Color.gray;
-            EditorGUILayout.LabelField("Not active...", s);
+            StatusStyle.normal.textColor = Color.gray;
+            EditorGUILayout.LabelField("Not active...", StatusStyle);
           }
         }
         else if (!_RemoteConnection.IsConnected)
         {
-          s.normal.textColor = Color.blue;
-          EditorGUILayout.LabelField("Waiting for remote device to connect...", s);
+          StatusStyle.normal.textColor = Color.cyan;
+          EditorGUILayout.LabelField("Waiting for remote device to connect", StatusStyle);
         }
         else
         {
-          s.normal.textColor = Color.green;
-          EditorGUILayout.LabelField("Connected!", s);
+          StatusStyle.normal.textColor = Color.green;
+          EditorGUILayout.LabelField("Connected", StatusStyle);
         }
       }
       else
       {
-        if (_RemoteConnection.IsEnabled)
-          EditorGUILayout.LabelField("Waiting for play mode...", s);
-        else
-          EditorGUILayout.LabelField("Not using remote...", s);
+        StatusStyle.normal.textColor = Color.grey;
+        EditorGUILayout.LabelField("Waiting for play mode", StatusStyle);
       }
     }
   }

@@ -37,9 +37,9 @@
 
             #include "UnityCG.glslinc"
 
-            // #ifdef SHADER_API_GLES3
-            // #extension GL_OES_EGL_image_external_essl3 : require
-            // #endif
+            #ifdef SHADER_API_GLES3
+            #extension GL_OES_EGL_image_external_essl3 : require
+            #endif
             
 #ifdef VERTEX
 
@@ -95,11 +95,9 @@
 
             uniform sampler2D _textureDepth;
             uniform sampler2D _textureDepthSuppressionMask;
-
-            // Currently, we render camera images using a cached version of the native texture.
-            // We don't require an OES sampler for the cached texture.
-            // uniform samplerExternalOES _texture;
-            uniform sampler2D _texture;
+            
+            uniform samplerExternalOES _texture;
+            // uniform sampler2D _texture;
 
 #if defined(SHADER_API_GLES3) && defined(DEPTH_ZWRITE)
 

@@ -33,7 +33,7 @@ namespace Niantic.ARDK.VirtualStudio.AR.Networking
 
     ~_MockARNetworkingSessionsMediator()
     {
-      ARLog._Error("_MockARNetworkingSessionsMediator was not correctly disposed.");
+      ARLog._Debug("_MockARNetworkingSessionsMediator was not correctly disposed.");
     }
 
     public void Dispose()

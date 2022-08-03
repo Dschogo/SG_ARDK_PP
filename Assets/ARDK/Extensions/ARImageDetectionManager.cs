@@ -39,13 +39,7 @@ namespace Niantic.ARDK.Extensions
 
     /// Images that will be used in the ARSession's configuration when it is next run, if this
     /// manager is enabled.
-    public IReadOnlyCollection<IARReferenceImage> RuntimeImages
-    {
-      get
-      {
-        return _readOnlyRuntimeImages;
-      }
-    }
+    public IReadOnlyCollection<IARReferenceImage> RuntimeImages => _readOnlyRuntimeImages;
 
     private readonly HashSet<IARReferenceImage> _runtimeImages = new HashSet<IARReferenceImage>();
     private ARDKReadOnlyCollection<IARReferenceImage> _readOnlyRuntimeImages;

@@ -21,138 +21,28 @@ namespace Niantic.ARDK.VirtualStudio.Editor
   [Serializable]
   internal sealed class _MockPlayConfigurationEditor
   {
-    private const string PLAY_CONFIGURATION_KEY = "ARDK_PlayConfiguration";
-    private const string INPUT_SESSION_ID_KEY = "ARDK_Input_Session_Identifier";
-    private const string MOCK_SCENE_KEY = "ARDK_Mock_Scene_Guid";
-
-    [SerializeField]
-    private MockPlayConfiguration _playConfiguration;
-
-    [SerializeField]
-    private string _inputSessionIdentifier;
-
-    private byte[] _detectedSessionMetadata;
-
-    [SerializeField]
-    private int _fps;
-
-    [SerializeField]
-    private float _moveSpeed;
-
-    [SerializeField]
-    private int _lookSpeed;
-
-    [SerializeField]
-    private bool _scrollDirection;
+    private _MockModeLauncher Launcher
+    {
+      get
+      {
+        return (_MockModeLauncher)_VirtualStudioLauncher.GetOrCreateModeLauncher(RuntimeEnvironment.Mock);
+      }
+    }
 
     private Dictionary<string, bool> _foldoutStates = new Dictionary<string, bool>();
 
-    private bool _listeningForJoin;
     private bool _isSelected;
 
     private string[] _mockSceneGuids;
     private string[] _mockSceneNames;
     private int _selectedMockSceneIndex;
-    private string _sceneGuid;
 
-    public _MockPlayConfigurationEditor()
+    public void OnSelectionChange(bool isSelected)
     {
-      if (_playConfiguration != null)
-        _playConfiguration._Initialize();
+      _isSelected = isSelected;
 
-      EditorApplication.playModeStateChanged += OnEditorPlayModeStateChanged;
-      ListenForInitialize();
-      _detectedSessionMetadata = null;
-    }
-
-    ~_MockPlayConfigurationEditor ()
-    {
-      EditorApplication.playModeStateChanged -= OnEditorPlayModeStateChanged;
-      MultipeerNetworkingFactory.NetworkingInitialized -= ListenForJoin;
-      _listeningForJoin = false;
-      _detectedSessionMetadata = null;
-    }
-
-    private void OnEditorPlayModeStateChanged(PlayModeStateChange stateChange)
-    {
-      _detectedSessionMetadata = null;
-
-      if (!_isSelected)
-        return;
-
-      switch (stateChange)
-      {
-        case PlayModeStateChange.EnteredPlayMode:
-          ListenForInitialize();
-
-          var existingConfig = _VirtualStudioManager.Instance.PlayConfiguration;
-          if (existingConfig == null)
-          {
-            if (_playConfiguration != null)
-              _playConfiguration._Initialize();
-          }
-          else
-          {
-            _playConfiguration = existingConfig;
-          }
-
-          if (string.IsNullOrEmpty(_sceneGuid))
-            break;
-
-          var path = AssetDatabase.GUIDToAssetPath(_sceneGuid);
-          var scenePrefab = AssetDatabase.LoadMainAssetAtPath(path);
-          if (scenePrefab == null)
-          {
-            ARLog._Error("Could not load selected mock scene.");
-            break;
-          }
-
-          GameObject.Instantiate(scenePrefab);
-
-          break;
-
-        case PlayModeStateChange.ExitingPlayMode:
-          MultipeerNetworkingFactory.NetworkingInitialized -= ListenForJoin;
-          _listeningForJoin = false;
-          break;
-      }
-    }
-
-    private void ListenForInitialize()
-    {
-      if (!_listeningForJoin)
-      {
-        MultipeerNetworkingFactory.NetworkingInitialized += ListenForJoin;
-        _listeningForJoin = true;
-      }
-    }
-
-    private void ListenForJoin(AnyMultipeerNetworkingInitializedArgs args)
-    {
-      args.Networking.Connected +=
-        connectedArgs =>
-        {
-          if (args.Networking is _MockMultipeerNetworking mockNetworking)
-            _detectedSessionMetadata = mockNetworking.JoinedSessionMetadata;
-        };
-    }
-
-    public void LoadPreferences()
-    {
-      var playConfigurationName = PlayerPrefs.GetString(PLAY_CONFIGURATION_KEY, null);
-
-      if (!string.IsNullOrEmpty(playConfigurationName))
-        _playConfiguration = GetPlayConfiguration(playConfigurationName);
-
-      _inputSessionIdentifier = PlayerPrefs.GetString(INPUT_SESSION_ID_KEY, "ABC");
-
-      _fps = _MockCameraConfiguration.FPS;
-      _moveSpeed = _MockCameraConfiguration.MoveSpeed;
-      _lookSpeed = _MockCameraConfiguration.LookSpeed;
-      _scrollDirection = _MockCameraConfiguration.ScrollDirection == -1;
-
-      _sceneGuid = PlayerPrefs.GetString(MOCK_SCENE_KEY, "");
-      LoadMockScenes();
+      if (_isSelected)
+        LoadMockScenes();
     }
 
     private void LoadMockScenes()
@@ -174,32 +64,9 @@ namespace Niantic.ARDK.VirtualStudio.Editor
         _mockSceneGuids[i] = guid;
         _mockSceneNames[i + 1] = mockPrefabs[i].Name;
 
-        if (_sceneGuid == guid)
+        if (Launcher.SceneGuid == guid)
           _selectedMockSceneIndex = i + 1;
       }
-    }
-
-    public void OnSelectionChange(bool isSelected)
-    {
-      _isSelected = isSelected;
-    }
-
-    private static MockPlayConfiguration GetPlayConfiguration(string name)
-    {
-      var filter = string.Format("{0} t:MockPlayConfiguration", name);
-      var guids = AssetDatabase.FindAssets(filter);
-
-      if (guids.Length == 0)
-      {
-        ARLog._WarnFormat("Could not load MockPlayConfiguration named: {0}", objs: name);
-        return null;
-      }
-
-      var assetPath = AssetDatabase.GUIDToAssetPath(guids[0]);
-      var asset = AssetDatabase.LoadAssetAtPath(assetPath, typeof(MockPlayConfiguration));
-
-      ARLog._DebugFormat("Loaded MockPlayConfiguration named: {0}", objs: name);
-      return asset as MockPlayConfiguration;
     }
 
     public void DrawGUI()
@@ -230,16 +97,19 @@ namespace Niantic.ARDK.VirtualStudio.Editor
     {
       EditorGUILayout.BeginHorizontal();
 
-      var newMockSceneIndex = EditorGUILayout.Popup
-        ("Mock Scene: ", _selectedMockSceneIndex, _mockSceneNames);
+      if (_mockSceneNames == null)
+        LoadMockScenes();
+
+      var newMockSceneIndex =
+        EditorGUILayout.Popup("Mock Scene: ", _selectedMockSceneIndex, _mockSceneNames);
 
       if (newMockSceneIndex != _selectedMockSceneIndex)
       {
         _selectedMockSceneIndex = newMockSceneIndex;
 
         var guid = _selectedMockSceneIndex >= 1 ? _mockSceneGuids[_selectedMockSceneIndex - 1] : "";
-        _sceneGuid = guid;
-        PlayerPrefs.SetString(MOCK_SCENE_KEY, guid);
+        Launcher.SceneGuid = guid;
+
       }
 
       if (GUILayout.Button(refreshArrow.ToString(), GUILayout.Width(50)))
@@ -257,35 +127,23 @@ namespace Niantic.ARDK.VirtualStudio.Editor
 
       EditorGUI.BeginDisabledGroup(Application.isPlaying);
 
-      var newFps = EditorGUILayout.IntField("FPS", _fps);
-      if (newFps != _fps)
-      {
-        _fps = newFps;
-        _MockCameraConfiguration.FPS = _fps;
-      }
+      var newFps = EditorGUILayout.IntField("FPS", Launcher.FPS);
+      if (newFps != Launcher.FPS)
+        Launcher.FPS = newFps;
 
       EditorGUI.EndDisabledGroup();
 
-      var newMovespeed = EditorGUILayout.Slider("Move Speed", _moveSpeed, 0.1f, 10f);
-      if (newMovespeed != _moveSpeed)
-      {
-        _moveSpeed = newMovespeed;
-        _MockCameraConfiguration.MoveSpeed = _moveSpeed;
-      }
+      var newMovespeed = EditorGUILayout.Slider("Move Speed", Launcher.MoveSpeed, 0.1f, 20f);
+      if (newMovespeed != Launcher.MoveSpeed)
+        Launcher.MoveSpeed = newMovespeed;
 
-      var newLookSpeed = EditorGUILayout.IntSlider("Look Speed", _lookSpeed, 1, 180);
-      if (newLookSpeed != _lookSpeed)
-      {
-        _lookSpeed = newLookSpeed;
-        _MockCameraConfiguration.LookSpeed = _lookSpeed;
-      }
+      var newLookSpeed = EditorGUILayout.IntSlider("Look Speed", Launcher.LookSpeed, 1, 180);
+      if (newLookSpeed != Launcher.LookSpeed)
+        Launcher.LookSpeed = newLookSpeed;
 
-      var newScrollDirection = EditorGUILayout.Toggle("Scroll Direction: Natural", _scrollDirection);
-      if (newScrollDirection != _scrollDirection)
-      {
-        _scrollDirection = newScrollDirection;
-        _MockCameraConfiguration.ScrollDirection = _scrollDirection ? -1 : 1;
-      }
+      var newScrollDirection = EditorGUILayout.Toggle("Scroll Direction: Natural", Launcher.ScrollDirection);
+      if (newScrollDirection != Launcher.ScrollDirection)
+        Launcher.ScrollDirection = newScrollDirection;
     }
 
     private void DrawPlayConfigurationSelector()
@@ -294,20 +152,13 @@ namespace Niantic.ARDK.VirtualStudio.Editor
         (MockPlayConfiguration) EditorGUILayout.ObjectField
         (
           "Play Configuration",
-          _playConfiguration,
+          Launcher.PlayConfiguration,
           typeof(MockPlayConfiguration),
           false
         );
 
-      if (_playConfiguration != newPlayConfiguration)
-      {
-        _playConfiguration = newPlayConfiguration;
-        PlayerPrefs.SetString
-        (
-          PLAY_CONFIGURATION_KEY,
-          _playConfiguration == null ? null : _playConfiguration.name
-        );
-      }
+      if (newPlayConfiguration != Launcher.PlayConfiguration)
+        Launcher.PlayConfiguration = newPlayConfiguration;
     }
 
     private void DrawPlayers()
@@ -316,20 +167,21 @@ namespace Niantic.ARDK.VirtualStudio.Editor
       GUILayout.Space(10);
       DrawLocalPlayer();
 
-      EditorGUI.BeginDisabledGroup(_playConfiguration == null);
+      var playConfiguration = Launcher.PlayConfiguration;
+      EditorGUI.BeginDisabledGroup(playConfiguration == null);
 
       EditorGUI.BeginDisabledGroup(!Application.isPlaying);
       if (GUILayout.Button("Connect and Run All", GUILayout.Width(200)))
       {
-        _playConfiguration.ConnectAllPlayersNetworkings(GetSessionMetadata());
-        _playConfiguration.RunAllPlayersARSessions();
+        playConfiguration.ConnectAllPlayersNetworkings(GetSessionMetadata());
+        playConfiguration.RunAllPlayersARSessions();
       }
 
       EditorGUI.EndDisabledGroup();
 
-      if (_playConfiguration != null)
+      if (playConfiguration != null)
       {
-        foreach (var profile in _playConfiguration.Profiles)
+        foreach (var profile in playConfiguration.Profiles)
         {
           DrawPlayerProfile(profile);
           GUILayout.Space(10);
@@ -411,7 +263,7 @@ namespace Niantic.ARDK.VirtualStudio.Editor
 
         GUILayout.Space(20);
 
-        if (!Application.isPlaying || !_playConfiguration._Initialized || !profile.IsActive)
+        if (!Application.isPlaying || !Launcher.PlayConfiguration._Initialized || !profile.IsActive)
           return;
 
         using (var col2 = new EditorGUILayout.VerticalScope())
@@ -432,7 +284,7 @@ namespace Niantic.ARDK.VirtualStudio.Editor
           else
           {
             if (GUILayout.Button("Run", style))
-              arSession.Run(_playConfiguration.GetARConfiguration(profile));
+              arSession.Run(Launcher.PlayConfiguration.GetARConfiguration(profile));
           }
 
           EditorGUI.EndDisabledGroup();
@@ -468,28 +320,25 @@ namespace Niantic.ARDK.VirtualStudio.Editor
 
     private void DrawSessionMetadataGUI()
     {
-      if (_detectedSessionMetadata != null && _detectedSessionMetadata.Length > 0)
+      if (Launcher.HasDetectedSessionMetadata)
       {
         EditorGUILayout.LabelField("Session Identifier", "Detected");
         return;
       }
 
       var newInputSessionIdentifier =
-        EditorGUILayout.TextField("Session Identifier", _inputSessionIdentifier);
+        EditorGUILayout.TextField("Session Identifier", Launcher.InputSessionIdentifier);
 
-      if (_inputSessionIdentifier != newInputSessionIdentifier)
-      {
-        _inputSessionIdentifier = newInputSessionIdentifier;
-        PlayerPrefs.SetString(INPUT_SESSION_ID_KEY, _inputSessionIdentifier);
-      }
+      if (newInputSessionIdentifier != Launcher.InputSessionIdentifier)
+        Launcher.InputSessionIdentifier = newInputSessionIdentifier;
     }
 
     private byte[] GetSessionMetadata()
     {
-      if (_detectedSessionMetadata != null)
-        return _detectedSessionMetadata;
+      if (Launcher.HasDetectedSessionMetadata)
+        return Launcher.DetectedSessionMetadata;
 
-      if (string.IsNullOrWhiteSpace(_inputSessionIdentifier))
+      if (string.IsNullOrWhiteSpace(Launcher.InputSessionIdentifier))
       {
         ARLog._Error
         (
@@ -500,7 +349,7 @@ namespace Niantic.ARDK.VirtualStudio.Editor
         return null;
       }
 
-      return Encoding.UTF8.GetBytes(_inputSessionIdentifier);
+      return Encoding.UTF8.GetBytes(Launcher.InputSessionIdentifier);
     }
   }
 }

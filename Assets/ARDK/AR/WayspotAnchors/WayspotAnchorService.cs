@@ -18,6 +18,9 @@ namespace Niantic.ARDK.AR.WayspotAnchors
   {
     /// The current localization state of the waypoint anchor service
     public LocalizationState LocalizationState { get; private set; }
+    
+    /// The localization failure reason, if applicable
+    public LocalizationFailureReason LocalizationFailureReason { get; private set; }
 
     private readonly WayspotAnchorController _wayspotAnchorController;
     private readonly IARSession _arSession;
@@ -120,11 +123,11 @@ namespace Niantic.ARDK.AR.WayspotAnchors
     /// @param ids The IDs of the wayspot anchors to destroy
     public void DestroyWayspotAnchors(params Guid[] ids)
     {
-      var wayspotAnchors = _wayspotAnchors.Values.Where
-          (a => Array.IndexOf(ids, a.ID) >= 0)
-        .ToArray();
+      var wayspotAnchors =
+        _wayspotAnchors.Values.Where(a => Array.IndexOf(ids, a.ID) >= 0).ToArray();
 
       _wayspotAnchorController.PauseTracking(wayspotAnchors);
+
       foreach (var id in ids)
       {
         _wayspotAnchors[id].Dispose();
@@ -161,12 +164,28 @@ namespace Niantic.ARDK.AR.WayspotAnchors
     {
       _wayspotAnchorController.StopVps();
       _locationService.Stop();
-      while (LocalizationState != LocalizationState.Failed)
+      while (LocalizationState != LocalizationState.Stopped)
       {
         await Task.Delay(1);
       }
       _locationService.Start();
       _wayspotAnchorController.StartVps(_wayspotAnchorsConfiguration);
+      
+      //Resume tracking anchors that have been created
+      while (LocalizationState != LocalizationState.Localized)
+      {
+        await Task.Delay(1);
+      }
+      var anchors = _wayspotAnchors.Values.ToArray();
+      _wayspotAnchorController.ResumeTracking(anchors);
+    }
+
+    /// Gets the status code for the specified wayspot anchor
+    /// @param id ID of anchor to get status code from
+    /// @return The status code for the specified anchor
+    public WayspotAnchorStatusCode GetWayspotAnchorStatusCode(Guid id)
+    {
+      return _wayspotAnchorStatusCodes[id];
     }
 
     /// Disposes of the Wayspot Anchor Service
@@ -202,10 +221,7 @@ namespace Niantic.ARDK.AR.WayspotAnchors
     private void HandleLocalizationStateUpdated(LocalizationStateUpdatedArgs localizationStateUpdatedArgs)
     {
       LocalizationState = localizationStateUpdatedArgs.State;
-      if (LocalizationState == LocalizationState.Failed)
-      {
-        ARLog._Error($"Localization has failed: {localizationStateUpdatedArgs.FailureReason}");
-      }
+      LocalizationFailureReason = localizationStateUpdatedArgs.FailureReason;
     }
 
     private void HandleWayspotAnchorsCreated(WayspotAnchorsCreatedArgs wayspotAnchorsCreatedArgs)

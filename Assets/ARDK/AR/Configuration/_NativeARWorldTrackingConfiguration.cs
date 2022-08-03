@@ -141,7 +141,7 @@ namespace Niantic.ARDK.AR.Configuration
       get { return base._MemoryPressure + 8; }
     }
 
-    public override ReadOnlyCollection<IARVideoFormat> SupportedVideoFormats
+    public override IReadOnlyCollection<IARVideoFormat> SupportedVideoFormats
     {
       get
       {
@@ -154,7 +154,7 @@ namespace Niantic.ARDK.AR.Configuration
             var obtained =
               _NARWorldTrackingConfiguration_GetSupportedVideoFormats
               (
-                _NativeHandle,
+                NativeHandle,
                 rawFormats.Length,
                 rawFormats
               );
@@ -185,7 +185,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return (PlaneDetection)_NARWorldTrackingConfiguration_GetPlaneDetection(_NativeHandle);
+          return (PlaneDetection)_NARWorldTrackingConfiguration_GetPlaneDetection(NativeHandle);
 
         #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
@@ -194,7 +194,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARWorldTrackingConfiguration_SetPlaneDetection(_NativeHandle, (UInt64)value);
+          _NARWorldTrackingConfiguration_SetPlaneDetection(NativeHandle, (UInt64)value);
       }
     }
 
@@ -211,7 +211,7 @@ namespace Niantic.ARDK.AR.Configuration
             var obtained =
               _NARWorldTrackingConfiguration_GetDetectionImages
               (
-                _NativeHandle,
+                NativeHandle,
                 rawImages.Length,
                 rawImages
               );
@@ -240,7 +240,7 @@ namespace Niantic.ARDK.AR.Configuration
 
           _NARWorldTrackingConfiguration_SetDetectionImages
           (
-            _NativeHandle,
+            NativeHandle,
             rawImages,
             (UInt64)rawImages.Length
           );
@@ -253,7 +253,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARWorldTrackingConfiguration_IsAutoFocusEnabled(_NativeHandle) != 0;
+          return _NARWorldTrackingConfiguration_IsAutoFocusEnabled(NativeHandle) != 0;
 
         #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
@@ -262,7 +262,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARWorldTrackingConfiguration_SetAutoFocusEnabled(_NativeHandle, value ? 1 : (UInt32)0);
+          _NARWorldTrackingConfiguration_SetAutoFocusEnabled(NativeHandle, value ? 1 : (UInt32)0);
       }
     }
 
@@ -271,7 +271,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-         return _NARWorldTrackingConfiguration_IsCollaborationEnabled(_NativeHandle) != 0;
+         return _NARWorldTrackingConfiguration_IsCollaborationEnabled(NativeHandle) != 0;
 
         #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
@@ -282,7 +282,7 @@ namespace Niantic.ARDK.AR.Configuration
         UInt32 uintValue = value ? 1 : (UInt32)0;
 
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARWorldTrackingConfiguration_SetCollaborationEnabled(_NativeHandle, uintValue);
+          _NARWorldTrackingConfiguration_SetCollaborationEnabled(NativeHandle, uintValue);
       }
     }
 
@@ -291,7 +291,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARConfiguration_GetDepthTargetFrameRate(_NativeHandle);
+          return _NARConfiguration_GetDepthTargetFrameRate(NativeHandle);
 
         #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
@@ -300,7 +300,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARConfiguration_SetDepthTargetFrameRate(_NativeHandle, value);
+          _NARConfiguration_SetDepthTargetFrameRate(NativeHandle, value);
       }
     }
 
@@ -309,7 +309,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARConfiguration_GetSemanticTargetFrameRate(_NativeHandle);
+          return _NARConfiguration_GetSemanticTargetFrameRate(NativeHandle);
 
         #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
@@ -318,7 +318,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARConfiguration_SetSemanticTargetFrameRate(_NativeHandle, value);
+          _NARConfiguration_SetSemanticTargetFrameRate(NativeHandle, value);
       }
     }
 
@@ -327,7 +327,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARConfiguration_IsDepthEnabled(_NativeHandle) != 0;
+          return _NARConfiguration_IsDepthEnabled(NativeHandle) != 0;
 
 #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
@@ -336,7 +336,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARConfiguration_SetDepthEnabled(_NativeHandle, value ? 1 : (UInt32)0);
+          _NARConfiguration_SetDepthEnabled(NativeHandle, value ? 1 : (UInt32)0);
       }
     }
 
@@ -347,7 +347,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARConfiguration_IsSemanticSegmentationEnabled(_NativeHandle) != 0;
+          return _NARConfiguration_IsSemanticSegmentationEnabled(NativeHandle) != 0;
 #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
 #pragma warning restore 0162
@@ -355,7 +355,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARConfiguration_SetSemanticSegmentationEnabled(_NativeHandle, value ? 1 : (UInt32)0);
+          _NARConfiguration_SetSemanticSegmentationEnabled(NativeHandle, value ? 1 : (UInt32)0);
       }
     }
 
@@ -364,7 +364,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARConfiguration_IsMeshingEnabled(_NativeHandle) != 0;
+          return _NARConfiguration_IsMeshingEnabled(NativeHandle) != 0;
 #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
 #pragma warning restore 0162
@@ -372,7 +372,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARConfiguration_SetMeshingEnabled(_NativeHandle, value ? 1 : (UInt32)0);
+          _NARConfiguration_SetMeshingEnabled(NativeHandle, value ? 1 : (UInt32)0);
       }
     }
 
@@ -381,7 +381,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARConfiguration_GetMeshingTargetFrameRate(_NativeHandle);
+          return _NARConfiguration_GetMeshingTargetFrameRate(NativeHandle);
 #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
 #pragma warning restore 0162
@@ -389,7 +389,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARConfiguration_SetMeshingTargetFrameRate(_NativeHandle, value);
+          _NARConfiguration_SetMeshingTargetFrameRate(NativeHandle, value);
       }
     }
 
@@ -398,7 +398,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARConfiguration_GetMeshingRadius(_NativeHandle);
+          return _NARConfiguration_GetMeshingRadius(NativeHandle);
     #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
     #pragma warning restore 0162
@@ -417,7 +417,7 @@ namespace Niantic.ARDK.AR.Configuration
         }
 
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARConfiguration_SetMeshingRadius(_NativeHandle, value);
+          _NARConfiguration_SetMeshingRadius(NativeHandle, value);
       }
     }
 
@@ -426,7 +426,7 @@ namespace Niantic.ARDK.AR.Configuration
       get
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          return _NARConfiguration_GetMeshingTargetBlockSize(_NativeHandle);
+          return _NARConfiguration_GetMeshingTargetBlockSize(NativeHandle);
 #pragma warning disable 0162
         throw new IncorrectlyUsedNativeClassException();
 #pragma warning restore 0162
@@ -434,7 +434,7 @@ namespace Niantic.ARDK.AR.Configuration
       set
       {
         if (NativeAccess.Mode == NativeAccess.ModeType.Native)
-          _NARConfiguration_SetMeshingTargetBlockSize(_NativeHandle, value);
+          _NARConfiguration_SetMeshingTargetBlockSize(NativeHandle, value);
       }
     }
 
@@ -452,7 +452,7 @@ namespace Niantic.ARDK.AR.Configuration
 
         _NARWorldTrackingConfiguration_SetDetectionImagesAsync
         (
-          _NativeHandle,
+          NativeHandle,
           rawImages,
           (UInt64)rawImages.Length,
           SafeGCHandle.AllocAsIntPtr(completionHandler),

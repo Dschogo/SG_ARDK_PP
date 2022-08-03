@@ -9,6 +9,7 @@ public class GPScontroller : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI Distance;
     [SerializeField] private TextMeshProUGUI poiname;
+    [SerializeField] private TextMeshProUGUI countname;
     [SerializeField] private RawImage compass_img;
     [SerializeField] private Button found_btn;
 
@@ -45,6 +46,16 @@ public class GPScontroller : MonoBehaviour
 
     void Update()
     {
+
+        if (Stateholder.pois[Stateholder.curr_poi].following != null)
+        {
+
+            countname.text = (Stateholder.curr_schnitzel_counter + 1) + "/" + (Stateholder.pois[Stateholder.curr_poi].following.Length + 1);
+        }
+        else
+        {
+            countname.text = "";
+        }
 
         if (Input.location.status == LocationServiceStatus.Failed)
         {

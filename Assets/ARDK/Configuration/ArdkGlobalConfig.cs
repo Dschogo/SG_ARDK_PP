@@ -15,9 +15,11 @@ namespace Niantic.ARDK.Configuration
   /// settings remotely and set them before running the rest of the application.
   public static class ArdkGlobalConfig
   {
-    internal const string _DBOW_URL = "https://bowvocab.eng.nianticlabs.com/dbow_b50_l3.bin";
-    internal const string _DEFAULT_AUTH_URL = "https://us-central1-ar-dev-portal-prod.cloudfunctions.net/auth_token";
+    internal const string _DbowUrl = "https://bowvocab.eng.nianticlabs.com/dbow_b50_l3.bin";
+    internal const string _DefaultAuthUrl = "https://us-central1-ar-dev-portal-prod.cloudfunctions.net/auth_token";
     
+    private static readonly _ArdkGlobalConfigBase _impl;
+
     static ArdkGlobalConfig()
     {
       var implementationType = _GetImplementationType();
@@ -26,22 +28,19 @@ namespace Niantic.ARDK.Configuration
       {
         case _ImplementationType.Native:
           _impl = new _NativeArdkConfig();
-          ARLog._Debug("_NativeArdkConfigInternal");
-          _Internal = new _NativeArdkConfigInternal();
           break;
 
         case _ImplementationType.Placeholder:
         default:
           _impl = new _PlaceholderArdkConfig();
-          ARLog._Debug("_PlaceholderArdkConfigInternal");
-          _Internal = new _PlaceholderArdkConfigInternal();
           break;
       }
     }
-
-    private static _IArdkConfig _impl { get; }
-
-    internal static _IArdkConfigInternal _Internal { get; }
+    
+    internal static _IArdkMetadataConfig _Internal
+    {
+      get => _impl; 
+    }
 
     public static bool SetDbowUrl(string url)
     {

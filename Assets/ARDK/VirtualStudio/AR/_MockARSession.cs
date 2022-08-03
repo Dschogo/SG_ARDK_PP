@@ -302,7 +302,7 @@ namespace Niantic.ARDK.VirtualStudio.AR
 
     public void RemoveAnchor(IARAnchor anchor)
     {
-      if (State != ARSessionState.Running)
+      if (State != ARSessionState.Running || anchor == null)
         return;
 
       if (!_anchors.ContainsKey(anchor.Identifier))

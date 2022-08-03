@@ -27,7 +27,7 @@ public class inv_image : MonoBehaviour
         {
             my_transform = this.transform.position;
             this.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
-            this.transform.position = canvas.transform.position;
+            this.transform.position = new Vector3(canvas.transform.position.x, canvas.transform.position.y, -30);
             big = true;
         }
     }
