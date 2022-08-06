@@ -2,11 +2,11 @@
     "version": "0.1",
     "pois": [
         {
-            "name": "Terrasse",
+            "name": "Schnitzel",
             "coordinates": [49.857936, 8.558297],
             "following": [
-                { "name": "Terrasse", "coordinates": [49.857936, 8.558297] },
-                { "name": "Terrasse2", "coordinates": [49.857936, 8.558297] }
+                { "name": "Point 1", "coordinates": [48.857936, 9.558297] },
+                { "name": "Point 2", "coordinates": [49.157936, 8.158297] }
             ]
         },
         {
