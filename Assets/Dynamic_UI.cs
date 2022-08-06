@@ -26,6 +26,7 @@ public class POIS
 {
     //employees is case sensitive and must match the string "employees" in the JSON.
     public POI[] pois;
+    public int version;
 }
 public class Dynamic_UI : MonoBehaviour
 {
@@ -43,23 +44,40 @@ public class Dynamic_UI : MonoBehaviour
 
     private float _headingVelocity = 0f;
 
+    private int version = 0;
+
+    private int local_version = 0;
+
 
     void Start()
     {
-        //StartCoroutine(GetRequest("https://pastebin.com/raw/fp0dVQnw"));
-        if (Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            Debug.Log("Reading local poi json");
-            StreamReader reader = new StreamReader("Assets/POI.json");
-            pois = JsonUtility.FromJson<POIS>(reader.ReadToEnd()).pois;
-            this.fechtedpoi = true;
-        }
-        else
-        {
-            StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POI.json"));
-        }
+        StreamReader reader = new StreamReader("Assets/POI.json");
+        var localjson = JsonUtility.FromJson<POIS>(reader.ReadToEnd());
 
+        local_version = localjson.version;
+        StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POIversion.txt"));
+        for (int i = 0; i < 30; i++)
+        {
+
+            Debug.Log(local_version + " " + version);
+            if (version > 0)
+            {
+                if (local_version < version)
+                {
+                    StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POI.json"));
+                }
+                else
+                {
+                    Debug.Log("Reading local poi json");
+                    fechtedpoi = true;
+                    pois = localjson.pois;
+                }
+                break;
+            }
+        }
     }
+
+
 
     void create_entry(POI poi, int i)
     {
@@ -198,9 +216,15 @@ public class Dynamic_UI : MonoBehaviour
                     break;
                 case UnityWebRequest.Result.Success:
                     Debug.Log(pages[page] + ":\nReceived: " + webRequest.downloadHandler.text);
-                    //if (pages[page] == "fp0dVQnw")
-                    this.fechtedpoi = true;
-                    pois = JsonUtility.FromJson<POIS>(webRequest.downloadHandler.text).pois;
+                    if (pages[page] == "POI.json")
+                    {
+                        this.fechtedpoi = true;
+                        pois = JsonUtility.FromJson<POIS>(webRequest.downloadHandler.text).pois;
+                    }
+                    if (pages[page] == "POIversion.json")
+                    {
+                        this.version = int.Parse(webRequest.downloadHandler.text);
+                    }
 
                     break;
             }
