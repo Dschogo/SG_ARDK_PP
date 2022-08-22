@@ -2,6 +2,10 @@
     "version": "1",
     "pois": [
         {
+            "name": "awslkjfnpwaoliufjnbs Uhr",
+            "coordinates": [49.857971, 8.55825]
+        },
+        {
             "name": "Schnitzel",
             "coordinates": [49.857936, 8.558297],
             "following": [

@@ -18,11 +18,14 @@ EditorBuildSettings:
     path: Assets/Scenes/VPSCreate.unity
     guid: 9416b9171502e0e4e87f1802caef1483
   - enabled: 1
-    path: Assets/Scenes/VPSsearch.unity
-    guid: 7fc50a6b4f982a94085782c09fa13a9f
-  - enabled: 1
     path: Assets/Scenes/Inv.unity
     guid: f81b0ed8810fd184280f028f09c9bc2c
+  - enabled: 1
+    path: Assets/Scenes/VPSAllFunctions.unity
+    guid: 427175a7735df384086e97791165c33e
+  - enabled: 1
+    path: Assets/Scenes/VPSSearch.unity
+    guid: 5da1822407615484996ec62aac7d282e
   m_configObjects:
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 6f70b1763ea9d4749a5714274f31dcd2,
       type: 2}

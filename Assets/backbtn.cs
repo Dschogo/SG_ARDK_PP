@@ -27,6 +27,9 @@ public class backbtn : MonoBehaviour
                 case "VPSCreate":
                     SceneManager.LoadScene("SearchGPS");
                     break;
+                case "VPSSearch":
+                    SceneManager.LoadScene("SearchGPS");
+                    break;
                 default:
                     Application.Quit();
                     break;
