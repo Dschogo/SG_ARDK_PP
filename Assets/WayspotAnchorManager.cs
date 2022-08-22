@@ -33,6 +33,12 @@ namespace WayspotAnchors
     [SerializeField]
     private Text _localizationStatus;
 
+    [SerializeField]
+    private GameObject pointer;
+
+    [SerializeField]
+    private bool _searchmode;
+    private bool loadedAnchors = false;
     private WayspotAnchorService _wayspotAnchorService;
     private IARSession _arSession;
     private LocalizationState _localizationState;
@@ -75,9 +81,22 @@ namespace WayspotAnchors
       var success = TryGetTouchInput(out Matrix4x4 localPose);
       if (_wayspotAnchorService.LocalizationState == LocalizationState.Localized)
       {
+        if(!loadedAnchors){ 
+          
+          LoadWayspotAnchors();
+          loadedAnchors = true;
+        }
         if (success) //Check is screen tap was a valid tap
         {
-          PlaceAnchor(localPose); //Create the Wayspot Anchor and place the GameObject
+          if(_searchmode)
+          {
+            PlacePointer(localPose);
+          }
+          else
+          {
+            PlaceAnchor(localPose);
+          }
+           //Create the Wayspot Anchor and place the GameObject
         }
       }
       else
@@ -219,6 +238,12 @@ namespace WayspotAnchors
       // CreateAnchorGameObjects(wayspotAnchors);
 
       _statusLog.text = "Anchor placed.";
+    }
+
+    private void PlacePointer(Matrix4x4 localPose)
+    {
+      pointer.transform.position = localPose.GetPosition();
+      _statusLog.text = "Pointer placed.";
     }
 
     private WayspotAnchorService CreateWayspotAnchorService()

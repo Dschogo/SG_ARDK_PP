@@ -1401,8 +1401,8 @@ MonoBehaviour:
   _camera: {fileID: 1739816011}
   _statusLog: {fileID: 1934137038}
   _localizationStatus: {fileID: 1247875423}
-  _searchMode: 1
-  _searchPointer: {fileID: 1243912124}
+  pointer: {fileID: 1243912124}
+  _searchmode: 1
 --- !u!4 &1199484540
 Transform:
   m_ObjectHideFlags: 0
