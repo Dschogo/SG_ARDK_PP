@@ -78,7 +78,6 @@ public class GPScontroller : MonoBehaviour
 
         }
         Distance.text = inradius ? "<" + Stateholder.radius + "m" : ((int)distance).ToString() + "m";
-        found_btn.interactable = inradius;
     }
 
 
