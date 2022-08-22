@@ -12,6 +12,7 @@ public class GPScontroller : MonoBehaviour
     [SerializeField] private TextMeshProUGUI countname;
     [SerializeField] private RawImage compass_img;
     [SerializeField] private Button found_btn;
+    [SerializeField] private Button hide_btn;
 
     private bool inradius;
     private double distance = 0;
@@ -34,12 +35,14 @@ public class GPScontroller : MonoBehaviour
         {
             inradius = true;
             found_btn.interactable = true;
+            hide_btn.interactable = true;
             compass_img.enabled = false;
         }
         else
         {
             inradius = false;
             found_btn.interactable = false;
+            hide_btn.interactable = false;
             compass_img.enabled = true;
         }
     }

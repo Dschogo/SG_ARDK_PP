@@ -48,20 +48,31 @@ public class Dynamic_UI : MonoBehaviour
 
     private int local_version = 0;
 
+    private POIS localjson;
+
 
     void Start()
     {
-        StreamReader reader = new StreamReader("Assets/POI.json");
-        var localjson = JsonUtility.FromJson<POIS>(reader.ReadToEnd());
 
-        local_version = localjson.version;
-        StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POIversion.txt"));
-        for (int i = 0; i < 30; i++)
+        if (PlayerPrefs.HasKey("POI"))
         {
+            localjson = JsonUtility.FromJson<POIS>(PlayerPrefs.GetString("POI"));
+            local_version = localjson.version;
+        }
+        StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POIversion.txt"));
+        StartCoroutine(waiter());
 
+    }
+
+    IEnumerator waiter()
+    {
+        for (int i = 0; i < 100; i++)
+        {
+            yield return new WaitForSeconds(0.1f);
             Debug.Log(local_version + " " + version);
             if (version > 0)
             {
+
                 if (local_version < version)
                 {
                     StartCoroutine(GetRequest("https://raw.githubusercontent.com/Dschogo/SG_ARDK_PP/main/Assets/POI.json"));
@@ -75,8 +86,9 @@ public class Dynamic_UI : MonoBehaviour
                 break;
             }
         }
-    }
 
+
+    }
 
 
     void create_entry(POI poi, int i)
@@ -219,9 +231,12 @@ public class Dynamic_UI : MonoBehaviour
                     if (pages[page] == "POI.json")
                     {
                         this.fechtedpoi = true;
+                        Debug.Log("settings new poi prefs");
+                        PlayerPrefs.SetString("POI", webRequest.downloadHandler.text);
+                        PlayerPrefs.Save();
                         pois = JsonUtility.FromJson<POIS>(webRequest.downloadHandler.text).pois;
                     }
-                    if (pages[page] == "POIversion.json")
+                    if (pages[page] == "POIversion.txt")
                     {
                         this.version = int.Parse(webRequest.downloadHandler.text);
                     }
