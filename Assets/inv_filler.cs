@@ -23,7 +23,7 @@ public class inv_filler : MonoBehaviour
                 go.GetComponentInChildren<RawImage>().color = new Color(1f, 1f, 1f, 1f);
             else
             {
-                go.GetComponentInChildren<RawImage>().color = new Color(1f, 1f, 1f, 0.5f);
+                go.GetComponentInChildren<RawImage>().color = new Color(1f, 1f, 1f, 0.1f);
             }
             go.transform.localScale = new Vector3(1, 1, 1);
             go.transform.localPosition = new Vector3(0, 0, 0);

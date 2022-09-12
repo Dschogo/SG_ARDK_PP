@@ -82,7 +82,6 @@ namespace WayspotAnchors
       if (_wayspotAnchorService.LocalizationState == LocalizationState.Localized)
       {
         if(!loadedAnchors){ 
-          
           LoadWayspotAnchors();
           loadedAnchors = true;
         }
@@ -99,6 +98,10 @@ namespace WayspotAnchors
            //Create the Wayspot Anchor and place the GameObject
         }
       }
+      else if (_wayspotAnchorService.LocalizationState == LocalizationState.Failed){
+        _statusLog.text = "Retsarting localization";
+        _wayspotAnchorService.Restart(); 
+      }
       else
       {
         if (success) //Check is screen tap was a valid tap
@@ -112,6 +115,7 @@ namespace WayspotAnchors
       }
       _localizationStatus.text = _wayspotAnchorService.LocalizationState.ToString();
       _localizationState = _wayspotAnchorService.LocalizationState;
+      
     }
 
     private void OnDisable()

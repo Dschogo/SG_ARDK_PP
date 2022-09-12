@@ -41,7 +41,7 @@ public class GPScontroller : MonoBehaviour
         else
         {
             inradius = false;
-            found_btn.interactable = false;
+            found_btn.interactable = false; // disable in release
             hide_btn.interactable = false;
             compass_img.enabled = true;
         }
