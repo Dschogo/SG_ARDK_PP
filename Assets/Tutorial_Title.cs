@@ -7,28 +7,46 @@ using TMPro;
 
 public class Tutorial_Title : MonoBehaviour
 {
+    [SerializeField] private GameObject panel;
     // Start is called before the first frame update
     void Start()
     {
-       
-       if(PlayerPrefs.GetString("finished") == "true")
+        //PlayerPrefs.SetString("finished", "false"); //vor Abgabe rausnehmen
+
+        if (PlayerPrefs.GetString("finished") == "true")
         {
-           
+            panel.SetActive(false);
         }
     }
-    void skipTutorial(bool skip)
-    {
 
-        if (skip)
-        {
+    public void hidePanel(GameObject panel)
+    {
+        panel.SetActive(false);
+    }
+    // public void skipTutorial(bool skip)
+    // {
+
+    //     if (skip)
+    //     {
+    //         PlayerPrefs.SetString("finished", "true");
+    //         gameObject.SetActive(false);
+            
+    //     }
+    // }
+    public void end_Tutorial(GameObject panel)
+    {
+        // if(SceneManager.GetActiveScene().name == "")
+        // {
             PlayerPrefs.SetString("finished", "true");
-            gameObject.SetActive(false);
-        }
+            panel.SetActive(false);
+        // }
     }
-
-    // Update is called once per frame
-    void Update()
+    
+    public void start_Tutorial(GameObject panel)
     {
-        
+
+        Debug.Log("Tutorial gestartet");
+        PlayerPrefs.SetString("finished", "false");
+        panel.SetActive(true);
     }
 }
