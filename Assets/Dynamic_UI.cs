@@ -18,6 +18,8 @@ public class POI
     public string image;
 
     public POI[] following;
+
+    public string[] anchors;
 }
 
 
@@ -41,8 +43,6 @@ public class Dynamic_UI : MonoBehaviour
     private POI[] pois;
     private bool fechtedpoi = false;
     private bool buildodui = false;
-
-    private float _headingVelocity = 0f;
 
     private int version = 0;
 
@@ -178,13 +178,9 @@ public class Dynamic_UI : MonoBehaviour
                     {
                         contents.transform.GetChild(i).GetComponentsInChildren<TextMeshProUGUI>()[1].text = curr_pos.GetDistanceTo(wanna_be).ToString("F2") + "m";
                         arrow.enabled = true;
-                        Quaternion compass = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
+                        float angle = (float)(Input.compass.trueHeading - getBearing(curr_pos, wanna_be));
 
-                        float angle = Mathf.SmoothDampAngle((int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y), Input.compass.trueHeading, ref _headingVelocity, 0.1f);
-
-                        //int angle = (int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y);
-
-                        arrow.transform.SetPositionAndRotation(arrow.transform.position, Quaternion.Euler(0, 0, angle - 90));
+                        arrow.transform.SetPositionAndRotation(arrow.transform.position, Quaternion.Euler(0, 0, angle));
                     }
 
                 }

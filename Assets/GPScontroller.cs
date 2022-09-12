@@ -17,8 +17,7 @@ public class GPScontroller : MonoBehaviour
     private bool inradius;
     private double distance = 0;
     private RectTransform compass_rect;
-
-    private float _headingVelocity = 0f;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -72,9 +71,9 @@ public class GPScontroller : MonoBehaviour
             distance = curr_pos.GetDistanceTo(wanna_be);
             Quaternion compass = Quaternion.Euler(0, -Input.compass.magneticHeading, 0);
 
-            float angle = Mathf.SmoothDampAngle((int)(getBearing(curr_pos, wanna_be) - compass.eulerAngles.y), Input.compass.trueHeading, ref _headingVelocity, 0.1f);
+            float angle = (float)(Input.compass.trueHeading - getBearing(curr_pos, wanna_be));
 
-            compass_rect.SetPositionAndRotation(compass_rect.transform.position, Quaternion.Euler(60, 0, angle - 90));
+            compass_rect.SetPositionAndRotation(compass_rect.transform.position, Quaternion.Euler(60, 0, angle));
 
         }
         Distance.text = inradius ? "<" + Stateholder.radius + "m" : ((int)distance).ToString() + "m";

@@ -26,9 +26,17 @@ namespace WayspotAnchors
       if (PlayerPrefs.HasKey(DataKey))
       {
         var payloads = new List<WayspotAnchorPayload>();
-        var json = PlayerPrefs.GetString(DataKey);
-        var wayspotAnchorsData = JsonUtility.FromJson<WayspotAnchorsData>(json);
-        foreach (var wayspotAnchorPayload in wayspotAnchorsData.Payloads)
+        // var json = PlayerPrefs.GetString(DataKey);
+        // var wayspotAnchorsData = JsonUtility.FromJson<WayspotAnchorsData>(json);
+        var payloads_serialized = new string[0];
+        if(Stateholder.pois[Stateholder.curr_poi].following != null)
+        {
+          payloads_serialized = Stateholder.pois[Stateholder.curr_poi].following[Stateholder.curr_schnitzel_counter].anchors;
+        }
+        else {
+          payloads_serialized = Stateholder.pois[Stateholder.curr_poi].anchors;
+        }
+        foreach (var wayspotAnchorPayload in payloads_serialized)
         {
           var payload = WayspotAnchorPayload.Deserialize(wayspotAnchorPayload);
           payloads.Add(payload);

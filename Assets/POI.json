@@ -1,9 +1,12 @@
 {
-    "version": "1",
+    "version": 3,
     "pois": [
         {
             "name": "awslkjfnpwaoliufjnbs Uhr",
-            "coordinates": [49.857971, 8.55825]
+            "coordinates": [49.857971, 8.55825],
+            "anchors": [
+                "ChUImqj71puGns1oEOrzifmFp9G+gwEY5OW3rtwVKkYKFgiCmLf4oeGXov8BELSH39uJ1LO8oAESJwoPDSSRBr8VatVZPx3oM4g/EhQNHOIhtxV5WCi/Ha1V5rUlrtxAPx0AAIA/"
+            ]
         },
         {
             "name": "Schnitzel",

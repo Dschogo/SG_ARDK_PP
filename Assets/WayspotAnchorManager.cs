@@ -135,6 +135,12 @@ namespace WayspotAnchors
       {
         var wayspotAnchors = _wayspotAnchorService.GetAllWayspotAnchors();
         var payloads = wayspotAnchors.Select(a => a.Payload);
+        
+        TextEditor textEditor = new TextEditor();
+        foreach (var payload in payloads) {
+          GUIUtility.systemCopyBuffer = payload.Serialize();
+        }
+
         WayspotAnchorDataUtility.SaveLocalPayloads(payloads.ToArray());
       }
       else
