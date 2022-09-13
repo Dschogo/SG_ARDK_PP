@@ -118,7 +118,7 @@ public class Dynamic_UI : MonoBehaviour
                 {
                     rt.sizeDelta = new Vector2(rt.sizeDelta.x, rt.sizeDelta.y + 100);
                     texta.enabled = true;
-                    texta.text = "Dies ist eine Schnitzeljagt mit " + (poi.following.Length + 1).ToString() + " Wegpunkten";
+                    texta.text = "Dies ist eine Schnitzeljagt mit " + (poi.following.Length).ToString() + " Wegpunkten";
                 }
 
 

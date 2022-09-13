@@ -52,7 +52,7 @@ public class GPScontroller : MonoBehaviour
         if (Stateholder.pois[Stateholder.curr_poi].following != null)
         {
 
-            countname.text = (Stateholder.curr_schnitzel_counter + 1) + "/" + (Stateholder.pois[Stateholder.curr_poi].following.Length + 1);
+            countname.text = (Stateholder.curr_schnitzel_counter + 1) + "/" + (Stateholder.pois[Stateholder.curr_poi].following.Length);
         }
         else
         {

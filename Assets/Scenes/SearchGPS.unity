@@ -2815,7 +2815,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _map: {fileID: 1617435086}
-  timeTakenDuringLerp: 1
+  timeTakenDuringLerp: 0
 --- !u!1 &1654773826
 GameObject:
   m_ObjectHideFlags: 0
